@@ -44,6 +44,7 @@ import {
 import './App.css';
 import { FeishuConfig } from './services/feishuService';
 import FeishuConfigComponent from './components/FeishuConfig';
+import ChatAssistant from './components/CustomerAssistant/ChatAssistant';
 
 const { Header, Content, Sider } = Layout;
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -672,331 +673,336 @@ function App() {
   }, []);
 
   return (
-    <Layout className="layout">
-      <Header className="header">
-        <div className="header-content">
-          <div className="logo">
-            {isMobile && (
-              <Button
-                type="text"
-                icon={collapsed ? <MenuUnfoldOutlined /> : <MenuFoldOutlined />}
-                onClick={() => setCollapsed(!collapsed)}
-                style={{ color: 'white', fontSize: '16px', marginRight: '8px' }}
-              />
+    <>
+      <Layout className="layout">
+        <Header className="header">
+          <div className="header-content">
+            <div className="logo">
+              {isMobile && (
+                <Button
+                  type="text"
+                  icon={collapsed ? <MenuUnfoldOutlined /> : <MenuFoldOutlined />}
+                  onClick={() => setCollapsed(!collapsed)}
+                  style={{ color: 'white', fontSize: '16px', marginRight: '8px' }}
+                />
+              )}
+              <DashboardOutlined style={{ fontSize: '24px', color: 'white', marginRight: '8px' }} />
+              <Typography.Title level={4} style={{ margin: 0, color: 'white' }}>Mars模型评测平台</Typography.Title>
+            </div>
+            
+            {/* 在非移动端或者菜单展开状态下显示菜单 */}
+            {(!isMobile || !collapsed) && (
+              <Menu 
+                theme="dark" 
+                mode={isMobile ? "inline" : "horizontal"}
+                selectedKeys={[activeTab]}
+                onSelect={({ key }) => {
+                  setActiveTab(key as string);
+                  if (isMobile) setCollapsed(true);
+                }}
+                style={{ 
+                  background: 'transparent', 
+                  borderBottom: 'none',
+                  flex: 1
+                }}
+              >
+                <Menu.Item key="compare" icon={<SyncOutlined />}>
+                  模型比较
+                </Menu.Item>
+                <Menu.Item key="batch" icon={<FileExcelOutlined />}>
+                  批量数据评测
+                </Menu.Item>
+                <Menu.Item key="prompts" icon={<FileTextOutlined />}>
+                  提示词模板
+                </Menu.Item>
+                <Menu.Item key="excel" icon={<TableOutlined />}>
+                  Excel处理
+                </Menu.Item>
+                <Menu.Item key="judgment" icon={<AuditOutlined />}>
+                  模型处理结果评测
+                </Menu.Item>
+                <Menu.Item key="chart" icon={<BarChartOutlined />}>
+                  数据分析与图表
+                </Menu.Item>
+                <Menu.Item key="image" icon={<CameraOutlined />}>
+                  图像分析
+                </Menu.Item>
+                <Menu.Item key="settings" icon={<SettingOutlined />}>
+                  模型配置
+                </Menu.Item>
+                <Menu.Item key="saved" icon={<HistoryOutlined />}>
+                  历史记录
+                </Menu.Item>
+                <Menu.Item key="feishu" icon={<SendOutlined />}>
+                  系统通知配置
+                </Menu.Item>
+              </Menu>
             )}
-            <DashboardOutlined style={{ fontSize: '24px', color: 'white', marginRight: '8px' }} />
-            <Typography.Title level={4} style={{ margin: 0, color: 'white' }}>Mars模型评测平台</Typography.Title>
+            
+            <Space className="header-actions">
+              {!isMobile && (
+                <Tooltip title="使用帮助">
+                  <Button type="text" icon={<CodeOutlined />} style={{ color: 'white' }} />
+                </Tooltip>
+              )}
+              <Dropdown menu={{ 
+                items: [
+                  {
+                    key: '1',
+                    label: '主题设置',
+                    icon: <SettingOutlined />
+                  },
+                  {
+                    key: '2',
+                    label: '导出数据',
+                    icon: <DatabaseOutlined />
+                  },
+                  {
+                    key: '3',
+                    label: '关于',
+                    icon: <TeamOutlined />
+                  },
+                  ...(isMobile ? [{
+                    key: '4',
+                    label: '使用帮助',
+                    icon: <CodeOutlined />
+                  }] : [])
+                ] 
+              }}>
+                <Avatar style={{ backgroundColor: 'rgba(255,255,255,0.2)', cursor: 'pointer' }} icon={<ToolOutlined />} />
+              </Dropdown>
+            </Space>
           </div>
-          
-          {/* 在非移动端或者菜单展开状态下显示菜单 */}
-          {(!isMobile || !collapsed) && (
-            <Menu 
-              theme="dark" 
-              mode={isMobile ? "inline" : "horizontal"}
-              selectedKeys={[activeTab]}
-              onSelect={({ key }) => {
-                setActiveTab(key as string);
-                if (isMobile) setCollapsed(true);
-              }}
-              style={{ 
-                background: 'transparent', 
-                borderBottom: 'none',
-                flex: 1
-              }}
-            >
-              <Menu.Item key="compare" icon={<SyncOutlined />}>
-                模型比较
-              </Menu.Item>
-              <Menu.Item key="batch" icon={<FileExcelOutlined />}>
-                批量数据评测
-              </Menu.Item>
-              <Menu.Item key="prompts" icon={<FileTextOutlined />}>
-                提示词模板
-              </Menu.Item>
-              <Menu.Item key="excel" icon={<TableOutlined />}>
-                Excel处理
-              </Menu.Item>
-              <Menu.Item key="judgment" icon={<AuditOutlined />}>
-                模型处理结果评测
-              </Menu.Item>
-              <Menu.Item key="chart" icon={<BarChartOutlined />}>
-                数据分析与图表
-              </Menu.Item>
-              <Menu.Item key="image" icon={<CameraOutlined />}>
-                图像分析
-              </Menu.Item>
-              <Menu.Item key="settings" icon={<SettingOutlined />}>
-                模型配置
-              </Menu.Item>
-              <Menu.Item key="saved" icon={<HistoryOutlined />}>
-                历史记录
-              </Menu.Item>
-              <Menu.Item key="feishu" icon={<SendOutlined />}>
-                系统通知配置
-              </Menu.Item>
-            </Menu>
-          )}
-          
-          <Space className="header-actions">
-            {!isMobile && (
-              <Tooltip title="使用帮助">
-                <Button type="text" icon={<CodeOutlined />} style={{ color: 'white' }} />
-              </Tooltip>
-            )}
-            <Dropdown menu={{ 
-              items: [
-                {
-                  key: '1',
-                  label: '主题设置',
-                  icon: <SettingOutlined />
-                },
-                {
-                  key: '2',
-                  label: '导出数据',
-                  icon: <DatabaseOutlined />
-                },
-                {
-                  key: '3',
-                  label: '关于',
-                  icon: <TeamOutlined />
-                },
-                ...(isMobile ? [{
-                  key: '4',
-                  label: '使用帮助',
-                  icon: <CodeOutlined />
-                }] : [])
-              ] 
-            }}>
-              <Avatar style={{ backgroundColor: 'rgba(255,255,255,0.2)', cursor: 'pointer' }} icon={<ToolOutlined />} />
-            </Dropdown>
-          </Space>
-        </div>
-      </Header>
-      
-      <Content>
-        <div className="site-layout-content">
-          <div className="content-container">
-            {activeTab === 'compare' && (
-              <div className="tab-content">
-                <div className="page-header">
-                  <Typography.Title level={4}>
-                    <SyncOutlined /> 模型比较
-                  </Typography.Title>
-                  <Typography.Text type="secondary">比较不同模型的输出结果，分析差异</Typography.Text>
-                </div>
-                <div className="main-layout">
-                  <div className="form-container">
-                    <ComparisonForm
-                      models={models}
-                      isLoading={isLoading}
-                      currentPrompt={currentPrompt}
-                      currentInput={currentInput}
-                      onPromptChange={setCurrentPrompt}
-                      onInputChange={setCurrentInput}
-                      onCompare={(selectedModelIds, prompt, input) => 
-                        handleCompare(selectedModelIds, prompt, input, enablePreprocess)
-                      }
-                      onSaveResult={handleSaveResult}
-                      onSaveInput={handleSaveInput}
-                      enablePreprocess={enablePreprocess}
-                      onEnablePreprocessChange={setEnablePreprocess}
-                      preprocessOptions={preprocessOptions}
-                      onPreprocessOptionsChange={setPreprocessOptions}
-                      speakerMap={speakerMap}
-                      onSpeakerMapChange={setSpeakerMap}
-                    />
+        </Header>
+        
+        <Content>
+          <div className="site-layout-content">
+            <div className="content-container">
+              {activeTab === 'compare' && (
+                <div className="tab-content">
+                  <div className="page-header">
+                    <Typography.Title level={4}>
+                      <SyncOutlined /> 模型比较
+                    </Typography.Title>
+                    <Typography.Text type="secondary">比较不同模型的输出结果，分析差异</Typography.Text>
                   </div>
-                  <div className="results-container">
-                    <ComparisonResults
-                      isLoading={isLoading}
-                      responses={responses}
-                      prompt={currentPrompt}
-                      input={currentInput}
-                    />
+                  <div className="main-layout">
+                    <div className="form-container">
+                      <ComparisonForm
+                        models={models}
+                        isLoading={isLoading}
+                        currentPrompt={currentPrompt}
+                        currentInput={currentInput}
+                        onPromptChange={setCurrentPrompt}
+                        onInputChange={setCurrentInput}
+                        onCompare={(selectedModelIds, prompt, input) => 
+                          handleCompare(selectedModelIds, prompt, input, enablePreprocess)
+                        }
+                        onSaveResult={handleSaveResult}
+                        onSaveInput={handleSaveInput}
+                        enablePreprocess={enablePreprocess}
+                        onEnablePreprocessChange={setEnablePreprocess}
+                        preprocessOptions={preprocessOptions}
+                        onPreprocessOptionsChange={setPreprocessOptions}
+                        speakerMap={speakerMap}
+                        onSpeakerMapChange={setSpeakerMap}
+                      />
+                    </div>
+                    <div className="results-container">
+                      <ComparisonResults
+                        isLoading={isLoading}
+                        responses={responses}
+                        prompt={currentPrompt}
+                        input={currentInput}
+                      />
+                    </div>
                   </div>
                 </div>
-              </div>
-            )}
-            
-            {activeTab === 'batch' && (
-              <div className="tab-content">
-                <div className="page-header">
-                  <Typography.Title level={4}>
-                    <FileExcelOutlined /> 批量数据评测
-                  </Typography.Title>
-                  <Typography.Text type="secondary">批量处理大量数据，提高评测效率</Typography.Text>
+              )}
+              
+              {activeTab === 'batch' && (
+                <div className="tab-content">
+                  <div className="page-header">
+                    <Typography.Title level={4}>
+                      <FileExcelOutlined /> 批量数据评测
+                    </Typography.Title>
+                    <Typography.Text type="secondary">批量处理大量数据，提高评测效率</Typography.Text>
+                  </div>
+                  <BatchProcessing
+                    models={models}
+                    onSaveBatchJob={handleSaveBatchJob}
+                    savedBatchJobs={savedBatchJobs}
+                    promptTemplates={promptTemplates}
+                    feishuConfig={feishuConfig}
+                    onFeishuConfigChange={handleFeishuConfigChange}
+                  />
                 </div>
-                <BatchProcessing
-                  models={models}
-                  onSaveBatchJob={handleSaveBatchJob}
-                  savedBatchJobs={savedBatchJobs}
-                  promptTemplates={promptTemplates}
-                  feishuConfig={feishuConfig}
-                  onFeishuConfigChange={handleFeishuConfigChange}
-                />
-              </div>
-            )}
-            
-            {activeTab === 'prompts' && (
-              <div className="tab-content">
-                <div className="page-header">
-                  <Typography.Title level={4}>
-                    <FileTextOutlined /> 提示词模板
-                  </Typography.Title>
-                  <Typography.Text type="secondary">管理常用提示词模板，提高评测一致性</Typography.Text>
+              )}
+              
+              {activeTab === 'prompts' && (
+                <div className="tab-content">
+                  <div className="page-header">
+                    <Typography.Title level={4}>
+                      <FileTextOutlined /> 提示词模板
+                    </Typography.Title>
+                    <Typography.Text type="secondary">管理常用提示词模板，提高评测一致性</Typography.Text>
+                  </div>
+                  <PromptTemplates
+                    templates={promptTemplates}
+                    onTemplatesChange={setPromptTemplates}
+                    onSelect={handleSelectPromptTemplate}
+                  />
                 </div>
-                <PromptTemplates
-                  templates={promptTemplates}
-                  onTemplatesChange={setPromptTemplates}
-                  onSelect={handleSelectPromptTemplate}
-                />
-              </div>
-            )}
-            
-            {activeTab === 'excel' && (
-              <div className="tab-content">
-                <div className="page-header">
-                  <Typography.Title level={4}>
-                    <TableOutlined /> Excel 处理工具
-                  </Typography.Title>
-                  <Typography.Text type="secondary">处理 Excel 表格，提取和筛选数据</Typography.Text>
+              )}
+              
+              {activeTab === 'excel' && (
+                <div className="tab-content">
+                  <div className="page-header">
+                    <Typography.Title level={4}>
+                      <TableOutlined /> Excel 处理工具
+                    </Typography.Title>
+                    <Typography.Text type="secondary">处理 Excel 表格，提取和筛选数据</Typography.Text>
+                  </div>
+                  <ExcelProcessor />
                 </div>
-                <ExcelProcessor />
-              </div>
-            )}
-            
-            {activeTab === 'judgment' && (
-              <div className="tab-content">
-                <div className="page-header">
-                  <Typography.Title level={4}>
-                    <AuditOutlined /> 模型处理结果评测
-                  </Typography.Title>
-                  <Typography.Text type="secondary">分析大模型处理结果，评估正确性和可靠性</Typography.Text>
+              )}
+              
+              {activeTab === 'judgment' && (
+                <div className="tab-content">
+                  <div className="page-header">
+                    <Typography.Title level={4}>
+                      <AuditOutlined /> 模型处理结果评测
+                    </Typography.Title>
+                    <Typography.Text type="secondary">分析大模型处理结果，评估正确性和可靠性</Typography.Text>
+                  </div>
+                  <JudgmentAnalyzer 
+                    models={models}
+                    promptTemplates={promptTemplates}
+                  />
                 </div>
-                <JudgmentAnalyzer 
-                  models={models}
-                  promptTemplates={promptTemplates}
-                />
-              </div>
-            )}
-            
-            {activeTab === 'chart' && (
-              <div className="tab-content">
-                <div className="page-header">
-                  <Typography.Title level={4}>
-                    <BarChartOutlined /> 数据分析与图表
-                  </Typography.Title>
-                  <Typography.Text type="secondary">分析数据，生成图表，辅助决策</Typography.Text>
+              )}
+              
+              {activeTab === 'chart' && (
+                <div className="tab-content">
+                  <div className="page-header">
+                    <Typography.Title level={4}>
+                      <BarChartOutlined /> 数据分析与图表
+                    </Typography.Title>
+                    <Typography.Text type="secondary">分析数据，生成图表，辅助决策</Typography.Text>
+                  </div>
+                  <ChartAnalyzer 
+                    models={models}
+                  />
                 </div>
-                <ChartAnalyzer 
-                  models={models}
-                />
-              </div>
-            )}
-            
-            {activeTab === 'settings' && (
-              <div className="tab-content">
-                <div className="page-header">
-                  <Typography.Title level={4}>
-                    <SettingOutlined /> 模型配置
-                  </Typography.Title>
-                  <Typography.Text type="secondary">配置模型参数和接口信息</Typography.Text>
+              )}
+              
+              {activeTab === 'settings' && (
+                <div className="tab-content">
+                  <div className="page-header">
+                    <Typography.Title level={4}>
+                      <SettingOutlined /> 模型配置
+                    </Typography.Title>
+                    <Typography.Text type="secondary">配置模型参数和接口信息</Typography.Text>
+                  </div>
+                  <ModelConfig
+                    models={models}
+                    onModelsChange={setModels}
+                  />
                 </div>
-                <ModelConfig
-                  models={models}
-                  onModelsChange={setModels}
-                />
-              </div>
-            )}
-            
-            {activeTab === 'saved' && (
-              <div className="tab-content">
-                <div className="page-header">
-                  <Typography.Title level={4}>
-                    <HistoryOutlined /> 历史记录
-                  </Typography.Title>
-                  <Typography.Text type="secondary">查看和管理已保存的评测结果和输入</Typography.Text>
+              )}
+              
+              {activeTab === 'saved' && (
+                <div className="tab-content">
+                  <div className="page-header">
+                    <Typography.Title level={4}>
+                      <HistoryOutlined /> 历史记录
+                    </Typography.Title>
+                    <Typography.Text type="secondary">查看和管理已保存的评测结果和输入</Typography.Text>
+                  </div>
+                  <SavedComparisons
+                    savedComparisons={savedComparisons}
+                    onLoad={handleLoadSavedComparison}
+                    onDelete={handleDeleteSavedComparison}
+                    onRename={handleRenameSavedComparison}
+                    onExportAll={handleExportAllSavedComparisons}
+                    onImport={handleImportSavedComparisons}
+                    savedInputs={savedInputs}
+                    onLoadInput={handleLoadSavedInput}
+                    onDeleteInput={handleDeleteSavedInput}
+                    onRenameInput={handleRenameSavedInput}
+                  />
                 </div>
-                <SavedComparisons
-                  savedComparisons={savedComparisons}
-                  onLoad={handleLoadSavedComparison}
-                  onDelete={handleDeleteSavedComparison}
-                  onRename={handleRenameSavedComparison}
-                  onExportAll={handleExportAllSavedComparisons}
-                  onImport={handleImportSavedComparisons}
-                  savedInputs={savedInputs}
-                  onLoadInput={handleLoadSavedInput}
-                  onDeleteInput={handleDeleteSavedInput}
-                  onRenameInput={handleRenameSavedInput}
-                />
-              </div>
-            )}
-            
-            {activeTab === 'feishu' && (
-              <div className="tab-content">
-                <div className="page-header">
-                  <Typography.Title level={4}>
-                    <SendOutlined /> 系统通知配置
-                  </Typography.Title>
-                  <Typography.Text type="secondary">配置系统通知设置</Typography.Text>
+              )}
+              
+              {activeTab === 'feishu' && (
+                <div className="tab-content">
+                  <div className="page-header">
+                    <Typography.Title level={4}>
+                      <SendOutlined /> 系统通知配置
+                    </Typography.Title>
+                    <Typography.Text type="secondary">配置系统通知设置</Typography.Text>
+                  </div>
+                  <FeishuConfigComponent 
+                    standalone={true}
+                    config={feishuConfig} 
+                    onChange={handleFeishuConfigChange} 
+                  />
                 </div>
-                <FeishuConfigComponent 
-                  standalone={true}
-                  config={feishuConfig} 
-                  onChange={handleFeishuConfigChange} 
-                />
-              </div>
-            )}
-            
-            {activeTab === 'image' && (
-              <div className="tab-content">
-                <div className="page-header">
-                  <Typography.Title level={4}>
-                    <CameraOutlined /> 图像分析
-                  </Typography.Title>
-                  <Typography.Text type="secondary">分析图像，提取特征，辅助决策</Typography.Text>
+              )}
+              
+              {activeTab === 'image' && (
+                <div className="tab-content">
+                  <div className="page-header">
+                    <Typography.Title level={4}>
+                      <CameraOutlined /> 图像分析
+                    </Typography.Title>
+                    <Typography.Text type="secondary">分析图像，提取特征，辅助决策</Typography.Text>
+                  </div>
+                  <ImageAnalyzer models={models} />
                 </div>
-                <ImageAnalyzer models={models} />
-              </div>
-            )}
+              )}
+            </div>
           </div>
-        </div>
-      </Content>
-      
-      <Modal
-        title="保存比较结果"
-        open={saveModalVisible}
-        onOk={confirmSaveResult}
-        onCancel={() => setSaveModalVisible(false)}
-        destroyOnClose
-      >
-        <Input
-          placeholder="请输入标题"
-          value={saveTitle}
-          onChange={(e) => setSaveTitle(e.target.value)}
-          autoFocus
-        />
-      </Modal>
+        </Content>
+        
+        <Modal
+          title="保存比较结果"
+          open={saveModalVisible}
+          onOk={confirmSaveResult}
+          onCancel={() => setSaveModalVisible(false)}
+          destroyOnClose
+        >
+          <Input
+            placeholder="请输入标题"
+            value={saveTitle}
+            onChange={(e) => setSaveTitle(e.target.value)}
+            autoFocus
+          />
+        </Modal>
 
-      <Modal
-        title="保存输入内容"
-        open={saveInputModalVisible}
-        onOk={confirmSaveInput}
-        onCancel={() => setSaveInputModalVisible(false)}
-        destroyOnClose
-      >
-        <Input
-          placeholder="请输入标题"
-          value={saveInputTitle}
-          onChange={(e) => setSaveInputTitle(e.target.value)}
-          autoFocus
-        />
-      </Modal>
+        <Modal
+          title="保存输入内容"
+          open={saveInputModalVisible}
+          onOk={confirmSaveInput}
+          onCancel={() => setSaveInputModalVisible(false)}
+          destroyOnClose
+        >
+          <Input
+            placeholder="请输入标题"
+            value={saveInputTitle}
+            onChange={(e) => setSaveInputTitle(e.target.value)}
+            autoFocus
+          />
+        </Modal>
+        
+        <Layout.Footer style={{ textAlign: 'center', background: 'transparent' }}>
+          Mars模型评测平台 ©{new Date().getFullYear()} 模型及数据测试分析工具
+        </Layout.Footer>
+      </Layout>
       
-      <Layout.Footer style={{ textAlign: 'center', background: 'transparent' }}>
-        Mars模型评测平台 ©{new Date().getFullYear()} 模型及数据测试分析工具
-      </Layout.Footer>
-    </Layout>
+      {/* 客服小助手放在Layout外部 */}
+      <ChatAssistant />
+    </>
   );
 }
 

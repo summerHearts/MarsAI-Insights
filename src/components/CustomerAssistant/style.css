@@ -1,0 +1,420 @@
+/* 基本容器样式 */
+.customer-assistant-container {
+  position: fixed;
+  bottom: 80px;
+  right: 20px;
+  width: 420px;
+  height: 550px;
+  max-width: 90vw;
+  max-height: 80vh;
+  border-radius: 10px;
+  box-shadow: 0 5px 20px rgba(0, 0, 0, 0.15);
+  z-index: 1000;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  background-color: #fff;
+  pointer-events: auto;
+}
+
+/* 客服按钮样式 */
+.assistant-button {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #2563eb, #0ea5e9);
+  color: white;
+  border: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 24px;
+  box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
+  cursor: pointer;
+  z-index: 999;
+  transition: transform 0.3s, box-shadow 0.3s;
+  pointer-events: auto;
+}
+
+/* 创建一个容器确保只有客服相关元素接收事件 */
+.assistant-wrapper {
+  position: fixed;
+  bottom: 0;
+  right: 0;
+  z-index: 999;
+  pointer-events: none; /* 让背景不接收事件，只有子元素接收 */
+  display: block;
+  width: 0;
+  height: 0;
+}
+
+.assistant-button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(37, 99, 235, 0.4);
+}
+
+.assistant-button:active {
+  transform: translateY(1px);
+  box-shadow: 0 2px 8px rgba(37, 99, 235, 0.2);
+}
+
+/* 聊天UI头部导航栏样式 */
+.customer-assistant-container .ChatApp-header {
+  background: linear-gradient(135deg, #2563eb, #0ea5e9);
+  min-height: 50px;
+  flex: 0 0 auto;
+}
+
+.customer-assistant-container .Navbar {
+  height: 50px;
+}
+
+.customer-assistant-container .Navbar-title {
+  font-size: 16px;
+}
+
+/* 确保聊天窗口内部可以滚动 */
+.customer-assistant-container .ChatApp {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.customer-assistant-container .MessageContainer {
+  flex: 1;
+  overflow-y: auto;
+  padding: 12px;
+  -webkit-overflow-scrolling: touch; /* 增强iOS滚动 */
+  height: auto;
+}
+
+/* 防止聊天组件影响主应用样式 */
+.customer-assistant-container * {
+  box-sizing: border-box;
+}
+
+/* 确保主应用可以正常滚动 */
+body, html {
+  overflow: auto !important; /* 确保全局滚动不受影响 */
+}
+
+/* 消息容器样式 */
+.customer-assistant-container .Message {
+  padding: 0;
+  margin-bottom: 16px;
+  display: flex;
+  align-items: flex-start;
+  width: 100%;
+}
+
+/* 右侧消息样式 - 用户 */
+.customer-assistant-container .Message--right {
+  flex-direction: row-reverse;
+  justify-content: flex-end;
+}
+
+/* 左侧消息样式 - 客服 */
+.customer-assistant-container .Message--left {
+  flex-direction: row;
+  justify-content: flex-start;
+}
+
+/* 头像样式 */
+.customer-assistant-container .Avatar {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  margin: 0 8px;
+  overflow: hidden;
+  flex-shrink: 0;
+  background-color: #f0f0f0;
+}
+
+.customer-assistant-container .Avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+/* 隐藏右侧消息的头像 */
+.customer-assistant-container .Message--right .Avatar {
+  display: none;
+}
+
+/* 气泡基本样式 */
+.customer-assistant-container .Bubble {
+  position: relative;
+  display: inline-block;
+  border-radius: 18px;
+  padding: 10px 14px;
+  font-size: 14px;
+  line-height: 1.5;
+  word-break: break-word;
+  white-space: pre-wrap;
+  max-width: 85%;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+}
+
+/* 左侧气泡样式 - 客服 */
+.customer-assistant-container .Bubble--left {
+  border-bottom-left-radius: 4px;
+  background-color: #f8f9fa;
+  color: #333;
+  margin-left: 8px;
+}
+
+/* 右侧气泡样式 - 用户 */
+.customer-assistant-container .Bubble--right {
+  border-bottom-right-radius: 4px;
+  background-color: #2563eb;
+  color: white;
+  margin-right: 8px;
+}
+
+/* 确保消息气泡内容样式 */
+.customer-assistant-container .Bubble-content {
+  display: inline-block;
+  overflow: hidden;
+}
+
+/* 添加嵌套消息结构样式 */
+.customer-assistant-container .Message-main {
+  flex: 1;
+  margin: 0;
+  overflow: hidden;
+}
+
+.customer-assistant-container .Message--right .Message-main {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.customer-assistant-container .Message--left .Message-main {
+  display: flex;
+  justify-content: flex-start;
+}
+
+.customer-assistant-container .Message-inner {
+  display: flex;
+  flex-direction: column;
+  position: relative;
+}
+
+.customer-assistant-container .Message--right .Message-inner {
+  align-items: flex-end;
+}
+
+.customer-assistant-container .Message--left .Message-inner {
+  align-items: flex-start;
+}
+
+.customer-assistant-container .Message-content {
+  position: relative;
+}
+
+/* 修复右侧用户消息的气泡样式 */
+.customer-assistant-container .Message--right .Bubble.text {
+  border-bottom-right-radius: 4px;
+  background-color: #2563eb;
+  color: white;
+}
+
+/* 确保右侧气泡内容居右 */
+.customer-assistant-container .Message--right .Bubble-content {
+  text-align: right;
+}
+
+/* 卡片样式 */
+.customer-assistant-container .Card {
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  margin-bottom: 12px;
+  width: 90%;
+  margin-left: 8px;
+}
+
+.customer-assistant-container .custom-card-content {
+  padding: 12px;
+}
+
+.customer-assistant-container .custom-card-content h4 {
+  margin-top: 0;
+  margin-bottom: 12px;
+  color: #2563eb;
+  font-size: 15px;
+  font-weight: 500;
+}
+
+.customer-assistant-container .CardText h4 {
+  margin-top: 0;
+  color: #2563eb;
+  font-size: 15px;
+  font-weight: 500;
+}
+
+.customer-assistant-container .List {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.customer-assistant-container .ListItem {
+  padding: 8px 12px;
+  border-bottom: 1px solid #f0f0f0;
+  font-size: 14px;
+}
+
+.customer-assistant-container .ListItem:last-child {
+  border-bottom: none;
+}
+
+.customer-assistant-container .ListItem:hover {
+  background-color: #f8f9fa;
+  cursor: pointer;
+}
+
+/* 快速回复样式 */
+.customer-assistant-container .QuickReplies {
+  margin-top: auto;
+  padding: 10px 4px;
+  background: #fff;
+  border-top: 1px solid #f0f0f0;
+  flex: 0 0 auto;
+  overflow-x: auto;
+  white-space: nowrap;
+  -webkit-overflow-scrolling: touch;
+}
+
+.customer-assistant-container .QuickReplies-list {
+  display: flex;
+  flex-wrap: nowrap;
+  padding: 0 4px;
+}
+
+.customer-assistant-container .QuickReply {
+  background-color: #f8f9fa;
+  border: 1px solid #e9e9e9;
+  color: #333;
+  font-size: 14px;
+  padding: 8px 16px;
+  margin: 4px;
+  border-radius: 20px;
+  display: inline-flex;
+  align-items: center;
+  white-space: nowrap;
+}
+
+.customer-assistant-container .QuickReply:hover {
+  background-color: #eaeffd;
+  border-color: #2563eb;
+  color: #2563eb;
+}
+
+/* 输入区域样式 */
+.customer-assistant-container .Composer {
+  border-top: 1px solid #f0f0f0;
+  padding: 10px 14px;
+  flex: 0 0 auto;
+  background-color: #fff;
+}
+
+.customer-assistant-container .Composer-input {
+  border-radius: 20px;
+  padding: 10px 16px;
+  font-size: 14px;
+  background-color: #f8f9fa;
+  min-height: 40px;
+}
+
+.customer-assistant-container .Composer-actions {
+  padding: 0 8px;
+}
+
+.customer-assistant-container .Composer-sendBtn {
+  background-color: #2563eb;
+  width: 32px;
+  height: 32px;
+  border-radius: 16px;
+}
+
+/* 打字指示器样式 */
+.customer-assistant-container .Typing {
+  padding: 8px 12px;
+}
+
+.customer-assistant-container .Typing-dot {
+  background-color: #2563eb;
+}
+
+/* 系统消息样式 */
+.customer-assistant-container .MessageContainer > .Message.Message--system {
+  justify-content: center;
+  margin: 10px 0;
+}
+
+.customer-assistant-container .SystemMessage {
+  background-color: rgba(0, 0, 0, 0.05);
+  padding: 6px 10px;
+  border-radius: 12px;
+  font-size: 12px;
+  color: #666;
+  max-width: 80%;
+  text-align: center;
+}
+
+/* 隔离样式，防止与主应用冲突 */
+.customer-assistant-container {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+  line-height: 1.5;
+  color: #333;
+}
+
+/* 媒体查询，在移动端调整位置和大小 */
+@media (max-width: 768px) {
+  .customer-assistant-container {
+    bottom: 0;
+    right: 0;
+    width: 100%;
+    height: 100%;
+    max-width: 100%;
+    max-height: 100%;
+    border-radius: 0;
+  }
+  
+  .assistant-button {
+    bottom: 20px;
+    right: 20px;
+    width: 45px;
+    height: 45px;
+    font-size: 20px;
+  }
+  
+  .customer-assistant-container .MessageContainer {
+    padding: 10px;
+  }
+}
+
+/* 平板尺寸优化 */
+@media (min-width: 769px) and (max-width: 1024px) {
+  .customer-assistant-container {
+    width: 380px;
+    max-width: 50vw;
+  }
+}
+
+/* 移除不再使用的样式 */
+.custom-message-wrapper, 
+.custom-message-right, 
+.custom-message-left, 
+.custom-avatar, 
+.custom-avatar img, 
+.custom-bubble-left, 
+.custom-bubble-right {
+  /* 不再使用这些类，但为了兼容性保留空规则 */
+}
