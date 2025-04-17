@@ -11,6 +11,7 @@ export interface Model {
   forceModelName?: string;
   supportsStreaming?: boolean;
   disabled?: boolean;
+  tags?: string[]; // 模型标签，用于标记特性，如"免费"、"VPN"等
 }
 
 export interface ModelResponse {
@@ -67,6 +68,10 @@ export interface PreprocessOptions {
 export interface ExcelItem {
   _rowId: number; // 添加行ID以便追踪
   [key: string]: any;
+}
+
+export interface SpeakerMap {
+  [key: string]: string;
 }
 
 export interface BatchProcessingConfig {

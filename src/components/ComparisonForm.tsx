@@ -149,20 +149,34 @@ const ComparisonForm: React.FC<ComparisonFormProps> = ({
                 onChange={handleModelsChange}
                 style={{ width: '100%' }}
                 optionFilterProp="label"
-                options={models.map(model => ({
-                  value: model.id,
-                  label: model.name,
-                }))}
+                options={models
+                  .sort((a, b) => {
+                    // 免费模型排在前面
+                    const aIsFree = a.tags?.includes('免费') || false;
+                    const bIsFree = b.tags?.includes('免费') || false;
+                    
+                    if (aIsFree && !bIsFree) return -1;
+                    if (!aIsFree && bIsFree) return 1;
+                    
+                    // 免费状态相同，按名称排序
+                    return a.name.localeCompare(b.name);
+                  })
+                  .map(model => ({
+                    value: model.id,
+                    label: model.name + (model.tags?.includes('免费') ? ' [免费]' : ''),
+                  }))
+                }
                 tagRender={props => {
                   const model = models.find(m => m.id === props.value);
                   return (
                     <Tag
-                      color="blue"
+                      color={model?.tags?.includes('免费') ? 'green' : 'blue'}
                       closable={props.closable}
                       onClose={props.onClose}
                       style={{ marginRight: 3 }}
                     >
                       {model?.name || props.value}
+                      {model?.tags?.includes('免费') && <span style={{ marginLeft: 4 }}>⭐</span>}
                     </Tag>
                   );
                 }}

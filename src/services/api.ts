@@ -80,15 +80,32 @@ const preprocessText = (text: string): string => {
   return processed;
 };
 
-// 修改处理流式响应的辅助函数以支持QWQ模型
+// 修改处理流式响应的辅助函数以支持QWQ模型和OpenRouter
 const processStreamChunk = (chunk: string): { content?: string, reasoning_content?: string } | null => {
   try {
     // 移除"data: "前缀
-    const jsonStr = chunk.replace(/^data: /, '').trim();
+    let jsonStr = chunk.replace(/^data: /, '').trim();
     
     // 忽略[DONE]消息
     if (jsonStr === '[DONE]') {
       return null;
+    }
+    
+    // 处理OpenRouter特殊格式的消息
+    if (jsonStr.startsWith(': OPENROUT') || !jsonStr.startsWith('{')) {
+      console.log('跳过非JSON格式的流式响应:', jsonStr);
+      return null;
+    }
+    
+    // 处理错误格式的JSON（如尾部缺少大括号）
+    try {
+      JSON.parse(jsonStr);
+    } catch (parseError) {
+      // 尝试修复可能的JSON格式问题
+      if (!jsonStr.endsWith('}') && jsonStr.includes('{')) {
+        jsonStr = jsonStr + '}';
+      }
+      // 如果还有其他格式问题，在这里添加更多修复逻辑
     }
     
     // 解析JSON
@@ -118,6 +135,11 @@ const processStreamChunk = (chunk: string): { content?: string, reasoning_conten
         result.content = choice.delta.message.content;
       }
       
+      // OpenRouter可能使用的其他格式
+      if (choice.content) {
+        result.content = choice.content;
+      }
+      
       if (Object.keys(result).length > 0) {
         return result;
       }
@@ -126,8 +148,25 @@ const processStreamChunk = (chunk: string): { content?: string, reasoning_conten
     return null;
   } catch (error) {
     console.error('处理流式响应块时出错:', error);
+    console.log('出错的响应块:', chunk); // 记录出错的具体响应块内容，便于调试
     return null;
   }
+};
+
+// 确保请求头值只包含ASCII字符
+const sanitizeHeaderValue = (value: string): string => {
+  // 如果值中包含非ASCII字符，则使用encodeURIComponent进行编码或移除它们
+  if (/[^\x00-\x7F]/.test(value)) {
+    console.warn(`请求头包含非ASCII字符，进行编码: ${value}`);
+    // 简单的解决方案：使用Base64编码
+    try {
+      return 'Base64:' + btoa(unescape(encodeURIComponent(value)));
+    } catch (e) {
+      // 如果编码出错，返回一个安全的替代值
+      return 'Mars API Client';
+    }
+  }
+  return value;
 };
 
 export const callModel = async (
@@ -200,12 +239,26 @@ export const callModel = async (
     // 如果模型支持流式输出，添加流式参数
     if (model.supportsStreaming && typeof parsedRequestBody === 'object') {
       parsedRequestBody.stream = true;
-      // 对于QWQ模型特别添加stream_options参数
-      if (model.forceModelName?.includes('qwq')) {
-        parsedRequestBody.stream_options = {
-          include_usage: true
-        };
+      
+      // 对于OpenRouter特定参数处理
+      if (model.baseUrl.includes('openrouter.ai')) {
+        // OpenRouter可能需要特定的流式参数
+        if (!parsedRequestBody.stream_options) {
+          parsedRequestBody.stream_options = {};
+        }
+        // 对于QWQ模型特别添加stream_options参数
+        if (model.forceModelName?.includes('qwen') || model.forceModelName?.includes('qwq')) {
+          parsedRequestBody.stream_options.include_usage = true;
+        }
+      } else {
+        // 对于QWQ模型特别添加stream_options参数
+        if (model.forceModelName?.includes('qwq')) {
+          parsedRequestBody.stream_options = {
+            include_usage: true
+          };
+        }
       }
+      
       console.log('启用流式输出');
     }
     
@@ -213,8 +266,14 @@ export const callModel = async (
     const requestUrl = `${model.baseUrl}${model.requestPath || ''}`;
     const headers: Record<string, string> = {
       'Content-Type': 'application/json',
-      ...model.headers,
     };
+    
+    // 添加模型自定义头信息，并确保所有值都经过sanitizeHeaderValue处理
+    if (model.headers) {
+      Object.entries(model.headers).forEach(([key, value]) => {
+        headers[key] = sanitizeHeaderValue(value);
+      });
+    }
     
     if (model.apiKey) {
       // 根据不同模型平台设置不同的Authorization格式
@@ -224,6 +283,11 @@ export const callModel = async (
         headers['Authorization'] = `Bearer ${model.apiKey}`;
       } else if (model.baseUrl.includes('openai.com')) {
         headers['Authorization'] = `Bearer ${model.apiKey}`;
+      } else if (model.baseUrl.includes('openrouter.ai')) {
+        headers['Authorization'] = `Bearer ${model.apiKey}`;
+        // OpenRouter特定请求头 - 使用英文或编码后的值以避免非ASCII字符
+        headers['HTTP-Referer'] = 'https://mars-ai-insights.com';
+        headers['X-Title'] = sanitizeHeaderValue('Mars Model Evaluation Platform');
       } else {
         // 默认Bearer格式
         headers['Authorization'] = `Bearer ${model.apiKey}`;
@@ -251,14 +315,21 @@ export const callModel = async (
         const validChunks = chunks.filter(chunk => chunk.trim() !== '');
         
         for (const chunk of validChunks) {
-          const processedContent = processStreamChunk(chunk);
-          if (processedContent) {
-            if (processedContent.content) {
-              fullContent += processedContent.content;
+          try {
+            const processedContent = processStreamChunk(chunk);
+            if (processedContent) {
+              if (processedContent.content) {
+                fullContent += processedContent.content;
+              }
+              if (processedContent.reasoning_content) {
+                fullReasoningContent += processedContent.reasoning_content;
+              }
             }
-            if (processedContent.reasoning_content) {
-              fullReasoningContent += processedContent.reasoning_content;
-            }
+          } catch (chunkError) {
+            console.warn('处理单个块时出错，已跳过:', chunk);
+            console.error(chunkError);
+            // 跳过此块，继续处理下一个
+            continue;
           }
         }
       }
@@ -364,6 +435,10 @@ export const callModel = async (
     } else if (error.request) {
       // 请求发送失败
       errorMessage = '无法连接到服务器，请检查网络或API地址';
+    } else if (errorMessage.includes('setRequestHeader') && errorMessage.includes('code point')) {
+      // 处理请求头编码错误
+      errorMessage = '请求头包含不支持的字符，已自动修复，请重试请求';
+      console.warn('检测到请求头编码问题，建议重试请求');
     }
     
     // 添加批处理错误日志
@@ -380,6 +455,178 @@ export const callModel = async (
       content: '',
       error: errorMessage,
       processedInput: options.enablePreprocess ? preprocessText(input) : undefined
+    };
+  }
+};
+
+export const callModelWithImage = async (
+  model: Model,
+  prompt: string,
+  imageBase64: string,
+  options: {
+    temperature?: number;
+    topP?: number;
+  } = {}
+): Promise<ModelResponse> => {
+  const startTime = Date.now();
+  
+  try {
+    // 构建请求体模板
+    let requestBody = model.requestTemplate || 
+      '{ "model": "{model}", "messages": [{"role": "user", "content": [{"type": "text", "text": "{prompt}"}, {"type": "image_url", "image_url": {"url": "data:image/jpeg;base64,{image}"}}]}], "stream": true }';
+    
+    // 替换模板变量
+    requestBody = safeTemplateReplace(requestBody, {
+      prompt,
+      image: imageBase64,
+      model: model.forceModelName || "qwen/qwen2.5-vl-32b-instruct:free"
+    });
+    
+    // 解析JSON
+    const parsedRequestBody = safeJsonParse(requestBody);
+    
+    // 添加随机性控制参数
+    if (typeof parsedRequestBody === 'object') {
+      // 设置默认值
+      const temperature = options.temperature ?? 0.1;
+      const topP = options.topP ?? 0.9;
+      
+      // 添加参数
+      if ('temperature' in parsedRequestBody) {
+        parsedRequestBody.temperature = temperature;
+      }
+      if ('top_p' in parsedRequestBody) {
+        parsedRequestBody.top_p = topP;
+      }
+    }
+    
+    // 构建请求配置
+    const requestUrl = `${model.baseUrl}${model.requestPath || ''}`;
+    const headers: Record<string, string> = {
+      'Content-Type': 'application/json',
+    };
+    
+    // 添加模型自定义头信息
+    if (model.headers) {
+      Object.entries(model.headers).forEach(([key, value]) => {
+        headers[key] = sanitizeHeaderValue(value);
+      });
+    }
+    
+    // 设置authorization
+    if (model.apiKey) {
+      if (model.baseUrl.includes('openrouter.ai')) {
+        headers['Authorization'] = `Bearer ${model.apiKey}`;
+        headers['HTTP-Referer'] = 'https://mars-ai-insights.com';
+        headers['X-Title'] = sanitizeHeaderValue('Mars Model Evaluation Platform');
+      } else {
+        headers['Authorization'] = `Bearer ${model.apiKey}`;
+      }
+    }
+    
+    console.log(`发送图像请求到模型 ${model.name}`);
+    
+    // 处理流式响应
+    if (parsedRequestBody.stream) {
+      const response = await axios.post(requestUrl, parsedRequestBody, {
+        headers,
+        responseType: 'text',
+      });
+      
+      let fullContent = '';
+      let chunks: string[] = [];
+      
+      if (typeof response.data === 'string') {
+        chunks = response.data.split('\n');
+        const validChunks = chunks.filter(chunk => chunk.trim() !== '');
+        
+        for (const chunk of validChunks) {
+          try {
+            const processedContent = processStreamChunk(chunk);
+            if (processedContent && processedContent.content) {
+              fullContent += processedContent.content;
+            }
+          } catch (chunkError) {
+            console.warn('处理单个块时出错，已跳过:', chunk);
+            continue;
+          }
+        }
+      }
+      
+      const responseTime = Date.now() - startTime;
+      console.log('--------------------------------------------------------');
+      console.log(`图像分析完成 - ${model.name}`);
+      console.log(`请求耗时: ${responseTime}ms`);
+      console.log('提示词:', prompt);
+      console.log('完整输出结果:');
+      console.log(fullContent);
+      console.log('--------------------------------------------------------');
+      
+      return {
+        modelId: model.id,
+        modelName: model.name,
+        responseTime,
+        content: fullContent,
+        rawResponse: { chunks, rawStreaming: true }
+      };
+    } else {
+      // 非流式处理
+      const response = await axios.post(requestUrl, parsedRequestBody, { headers });
+      const responseTime = Date.now() - startTime;
+      
+      let content = '';
+      if (response.data) {
+        try {
+          if (response.data.choices?.[0]?.message?.content) {
+            content = response.data.choices[0].message.content;
+          } else if (response.data.choices?.[0]?.content) {
+            content = response.data.choices[0].content;
+          } else {
+            content = JSON.stringify(response.data);
+          }
+        } catch (error) {
+          console.error('解析响应内容时出错:', error);
+          content = '解析响应内容失败';
+        }
+      }
+      
+      console.log('--------------------------------------------------------');
+      console.log(`图像分析结果 - ${model.name}`);
+      console.log(`请求耗时: ${responseTime}ms`);
+      console.log('提示词:', prompt);
+      console.log('完整输出结果:');
+      console.log(content);
+      console.log('--------------------------------------------------------');
+      
+      return {
+        modelId: model.id,
+        modelName: model.name,
+        responseTime,
+        content,
+        rawResponse: response.data
+      };
+    }
+  } catch (error: any) {
+    console.error(`图像处理时出错 ${model.name}:`, error);
+    
+    let errorMessage = error.message || '未知错误';
+    if (error.response) {
+      errorMessage = `服务器响应错误 (${error.response.status}): ${JSON.stringify(error.response.data)}`;
+    } else if (error.request) {
+      errorMessage = '无法连接到服务器，请检查网络或API地址';
+    }
+    
+    console.log('--------------------------------------------------------');
+    console.log(`图像处理失败 - ${model.name}`);
+    console.log('错误信息:', errorMessage);
+    console.log('--------------------------------------------------------');
+    
+    return {
+      modelId: model.id,
+      modelName: model.name,
+      responseTime: Date.now() - startTime,
+      content: '',
+      error: errorMessage
     };
   }
 };
