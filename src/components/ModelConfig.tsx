@@ -82,6 +82,85 @@ const ModelConfig: React.FC<ModelConfigProps> = ({ models, onModelsChange }) => 
       onOk: () => {
         // 从App.tsx导入DEFAULT_MODELS的值很复杂，我们简单粗暴地添加一些基础模型
         const defaultModels: Model[] = [
+          // OpenRouter免费模型
+          {
+            id: '101',
+            name: 'DeepSeek Chat V3 (免费)',
+            baseUrl: 'https://api.openrouter.ai',
+            requestPath: '/api/v1/chat/completions',
+            requestTemplate: '{"model": "deepseek/deepseek-chat-v3-0324:free", "messages": [{"role": "user", "content": "{prompt}\\n\\n{input}"}]}',
+            forceModelName: 'deepseek/deepseek-chat-v3-0324:free',
+            supportsStreaming: true,
+            apiKey: '请在这里填入您的OpenRouter API密钥',
+            tags: ['免费', 'VPN', 'Chat模型']
+          },
+          {
+            id: '102',
+            name: 'DeepSeek R1 (免费)',
+            baseUrl: 'https://api.openrouter.ai',
+            requestPath: '/api/v1/chat/completions',
+            requestTemplate: '{"model": "deepseek/deepseek-r1:free", "messages": [{"role": "user", "content": "{prompt}\\n\\n{input}"}]}',
+            forceModelName: 'deepseek/deepseek-r1:free',
+            supportsStreaming: true,
+            apiKey: '请在这里填入您的OpenRouter API密钥',
+            tags: ['免费', 'VPN', '思考型模型']
+          },
+          {
+            id: '103',
+            name: 'Qwen 2.5 72B (免费)',
+            baseUrl: 'https://api.openrouter.ai',
+            requestPath: '/api/v1/chat/completions',
+            requestTemplate: '{"model": "qwen/qwen-2.5-72b-instruct:free", "messages": [{"role": "user", "content": "{prompt}\\n\\n{input}"}]}',
+            forceModelName: 'qwen/qwen-2.5-72b-instruct:free',
+            supportsStreaming: true,
+            apiKey: '请在这里填入您的OpenRouter API密钥',
+            tags: ['免费', 'VPN', 'Chat模型']
+          },
+          {
+            id: '104',
+            name: 'Qwen 2.5 7B (免费)',
+            baseUrl: 'https://api.openrouter.ai',
+            requestPath: '/api/v1/chat/completions',
+            requestTemplate: '{"model": "qwen/qwen-2.5-7b-instruct:free", "messages": [{"role": "user", "content": "{prompt}\\n\\n{input}"}]}',
+            forceModelName: 'qwen/qwen-2.5-7b-instruct:free',
+            supportsStreaming: true,
+            apiKey: '请在这里填入您的OpenRouter API密钥',
+            tags: ['免费', 'VPN', 'Chat模型']
+          },
+          {
+            id: '105',
+            name: 'Qwen 2.5 VL 7B (图像分析,免费)',
+            baseUrl: 'https://api.openrouter.ai',
+            requestPath: '/api/v1/chat/completions',
+            requestTemplate: '{ "model": "qwen/qwen-2.5-vl-7b-instruct:free", "messages": [{"role": "user", "content": [{"type": "text", "text": "{prompt}"}, {"type": "image_url", "image_url": {"url": "data:image/jpeg;base64,{image}"}}]}] }',
+            forceModelName: 'qwen/qwen-2.5-vl-7b-instruct:free',
+            supportsStreaming: true,
+            apiKey: '请在这里填入您的OpenRouter API密钥',
+            tags: ['免费', 'VPN', '图像分析']
+          },
+          {
+            id: '106',
+            name: 'Qwen 2.5 VL 32B (图像分析,免费)',
+            baseUrl: 'https://api.openrouter.ai',
+            requestPath: '/api/v1/chat/completions',
+            requestTemplate: '{ "model": "qwen/qwen2.5-vl-32b-instruct:free", "messages": [{"role": "user", "content": [{"type": "text", "text": "{prompt}"}, {"type": "image_url", "image_url": {"url": "data:image/jpeg;base64,{image}"}}]}] }',
+            forceModelName: 'qwen/qwen2.5-vl-32b-instruct:free',
+            supportsStreaming: true,
+            apiKey: '请在这里填入您的OpenRouter API密钥',
+            tags: ['免费', 'VPN', '图像分析', 'Chat模型']
+          },
+          {
+            id: '107',
+            name: 'QWQ 32B (免费)',
+            baseUrl: 'https://api.openrouter.ai',
+            requestPath: '/api/v1/chat/completions',
+            requestTemplate: '{"model": "qwen/qwq-32b:free", "messages": [{"role": "user", "content": "{prompt}\\n\\n{input}"}]}',
+            forceModelName: 'qwen/qwq-32b:free',
+            supportsStreaming: true,
+            apiKey: '请在这里填入您的OpenRouter API密钥',
+            tags: ['免费', 'VPN', '流式响应', '思考型模型']
+          },
+          // 其他默认模型
           {
             id: '1',
             name: 'qwen2.5-14b-instruct-1m',
