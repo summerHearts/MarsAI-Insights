@@ -31,6 +31,16 @@ const { TextArea } = Input;
 const { Title, Text, Paragraph } = Typography;
 const { Panel } = Collapse;
 
+// 定义图表颜色方案常量
+const COLOR_SCHEMES = [
+  ['#5470c6', '#91cc75', '#fac858', '#ee6666', '#73c0de', '#3ba272', '#fc8452', '#9a60b4', '#ea7ccc'],
+  ['#91cc75', '#fac858', '#ee6666', '#73c0de', '#3ba272', '#fc8452', '#9a60b4', '#ea7ccc', '#5470c6'],
+  ['#fac858', '#ee6666', '#73c0de', '#3ba272', '#fc8452', '#9a60b4', '#ea7ccc', '#5470c6', '#91cc75'],
+  ['#ee6666', '#73c0de', '#3ba272', '#fc8452', '#9a60b4', '#ea7ccc', '#5470c6', '#91cc75', '#fac858'],
+  ['#73c0de', '#3ba272', '#fc8452', '#9a60b4', '#ea7ccc', '#5470c6', '#91cc75', '#fac858', '#ee6666'],
+  ['#3ba272', '#fc8452', '#9a60b4', '#ea7ccc', '#5470c6', '#91cc75', '#fac858', '#ee6666', '#73c0de']
+];
+
 interface ChartAnalyzerProps {
   models: Model[];
 }
@@ -441,9 +451,59 @@ const ChartAnalyzer: React.FC<ChartAnalyzerProps> = ({ models }) => {
             </div>
           ) : chartOption ? (
             <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-              <Card title={chartOption.title?.text || "数据可视化"} bordered={false}>
+              <Card 
+                title={(() => {
+                  // 处理主图表的标题去重
+                  let titleText = chartOption.title?.text || "数据可视化";
+                  
+                  // 从标题中提取关键部分，避免重复
+                  let cleanTitle = titleText;
+                  if (titleText.includes('-')) {
+                    const parts = titleText.split('-');
+                    cleanTitle = parts[0].trim();
+                  } else if (titleText.includes('：')) {
+                    const parts = titleText.split('：');
+                    cleanTitle = parts[0].trim();
+                  } else if (titleText.includes(':')) {
+                    const parts = titleText.split(':');
+                    cleanTitle = parts[0].trim();
+                  }
+                  
+                  return `主图表: ${cleanTitle}`;
+                })()} 
+                bordered={false}
+              >
                 <ReactECharts
-                  option={chartOption}
+                  option={(() => {
+                    // 深拷贝主图表选项对象，以便安全修改
+                    const optionCopy = JSON.parse(JSON.stringify(chartOption));
+                    
+                    // 处理标题去重
+                    let titleText = optionCopy.title?.text || "数据可视化";
+                    
+                    // 从标题中提取关键部分，避免重复
+                    let cleanTitle = titleText;
+                    if (titleText.includes('-')) {
+                      const parts = titleText.split('-');
+                      cleanTitle = parts[0].trim();
+                    } else if (titleText.includes('：')) {
+                      const parts = titleText.split('：');
+                      cleanTitle = parts[0].trim();
+                    } else if (titleText.includes(':')) {
+                      const parts = titleText.split(':');
+                      cleanTitle = parts[0].trim();
+                    }
+                    
+                    // 确保title对象存在
+                    if (!optionCopy.title) {
+                      optionCopy.title = {};
+                    }
+                    
+                    // 设置新的标题文本
+                    // optionCopy.title.text = `主图表: ${cleanTitle}`;
+                    
+                    return optionCopy;
+                  })()}
                   style={{ height: '400px', width: '100%' }}
                   notMerge={true}
                   lazyUpdate={true}
@@ -452,42 +512,150 @@ const ChartAnalyzer: React.FC<ChartAnalyzerProps> = ({ models }) => {
               
               {/* 如果有多个图表，显示额外的图表 */}
               {chartOptions.length > 1 && (
-                <Card title="多维度数据分析图表" bordered={false}>
+                <Card 
+                  title="多维度数据分析图表" 
+                  bordered={false}
+                  extra={
+                    <Tooltip title="点击标签页可查看不同维度的详细图表">
+                      <InfoCircleOutlined style={{ color: '#1677ff' }} />
+                    </Tooltip>
+                  }
+                >
+                  <Paragraph type="secondary" style={{ marginBottom: '16px' }}>
+                    以下是详细的多维度数据分析图表。每个标签页显示一个完整的图表，您可以点击彩色标签切换不同的数据维度视图，深入分析数据特征。
+                  </Paragraph>
                   <Tabs defaultActiveKey="0" type="card">
-                    {chartOptions.map((option, index) => (
-                      <Tabs.TabPane 
-                        tab={option.title?.text || `图表 ${index + 1}`} 
-                        key={index.toString()}
-                      >
-                        <ReactECharts
-                          option={option}
-                          style={{ height: '400px', width: '100%' }}
-                          notMerge={true}
-                          lazyUpdate={true}
-                        />
-                      </Tabs.TabPane>
-                    ))}
+                    {chartOptions.map((option, index) => {
+                      // 使用与其他部分相同的颜色方案
+                      const colorScheme = COLOR_SCHEMES[index % COLOR_SCHEMES.length];
+                      
+                      // 深拷贝选项对象，以便安全修改
+                      const optionCopy = JSON.parse(JSON.stringify(option));
+                      
+                      // 设置图表的颜色
+                      if (optionCopy.series && Array.isArray(optionCopy.series)) {
+                        optionCopy.color = colorScheme;
+                      }
+                      
+                      const mainColor = colorScheme[0];
+                      
+                      // 处理标题去重
+                      let titleText = option.title?.text || `图表 ${index + 1}`;
+                      
+                      // 从标题中提取关键部分，避免重复
+                      let cleanTitle = titleText;
+                      if (titleText.includes('-')) {
+                        const parts = titleText.split('-');
+                        cleanTitle = parts[0].trim();
+                      } else if (titleText.includes('：')) {
+                        const parts = titleText.split('：');
+                        cleanTitle = parts[0].trim();
+                      } else if (titleText.includes(':')) {
+                        const parts = titleText.split(':');
+                        cleanTitle = parts[0].trim();
+                      }
+                      
+                      const tabTitle = (
+                        <span style={{ color: mainColor }}>
+                          {index + 1}. {cleanTitle}
+                        </span>
+                      );
+                      
+                      return (
+                        <Tabs.TabPane 
+                          tab={tabTitle}
+                          key={index.toString()}
+                        >
+                          <ReactECharts
+                            option={optionCopy}
+                            style={{ height: '400px', width: '100%' }}
+                            notMerge={true}
+                            lazyUpdate={true}
+                          />
+                        </Tabs.TabPane>
+                      );
+                    })}
                   </Tabs>
                 </Card>
               )}
               
               {/* 添加多图表网格视图，方便用户同时查看多个图表 */}
               {chartOptions.length > 1 && (
-                <Card title="图表概览" bordered={false}>
+                <Card 
+                  title="图表概览" 
+                  bordered={false}
+                  extra={
+                    <Tooltip title="每个图表使用独立的颜色方案，便于区分不同维度数据">
+                      <InfoCircleOutlined style={{ color: '#1677ff' }} />
+                    </Tooltip>
+                  }
+                >
+                  <Paragraph type="secondary" style={{ marginBottom: '16px' }}>
+                    下面展示了所有生成的图表，每个图表使用独特的颜色方案以便于区分不同数据维度。您可以通过这个概览快速比较不同图表之间的关系和差异。
+                  </Paragraph>
                   <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(400px, 1fr))', gap: '16px' }}>
-                    {chartOptions.map((option, index) => (
-                      <div key={index} style={{ border: '1px solid #f0f0f0', borderRadius: '4px', padding: '8px' }}>
-                        <Typography.Title level={5} style={{ marginBottom: '8px' }}>
-                          {option.title?.text || `图表 ${index + 1}`}
-                        </Typography.Title>
-                        <ReactECharts
-                          option={option}
-                          style={{ height: '300px', width: '100%' }}
-                          notMerge={true}
-                          lazyUpdate={true}
-                        />
-                      </div>
-                    ))}
+                    {chartOptions.map((option, index) => {
+                      // 为每个图表定义不同的颜色主题
+                      const colorScheme = COLOR_SCHEMES[index % COLOR_SCHEMES.length];
+                      
+                      // 深拷贝选项对象，以便安全修改
+                      const optionCopy = JSON.parse(JSON.stringify(option));
+                      
+                      // 设置图表的颜色
+                      if (optionCopy.series && Array.isArray(optionCopy.series)) {
+                        // 添加颜色数组到选项中
+                        optionCopy.color = colorScheme;
+                      }
+                      
+                      // 边框颜色变化，增加视觉区分
+                      const borderColor = colorScheme[0];
+                      
+                      // 处理标题去重
+                      let titleText = option.title?.text || `图表 ${index + 1}`;
+                      
+                      // 从标题中提取关键部分，避免重复
+                      let cleanTitle = titleText;
+                      if (titleText.includes('-')) {
+                        const parts = titleText.split('-');
+                        cleanTitle = parts[0].trim();
+                      } else if (titleText.includes('：')) {
+                        const parts = titleText.split('：');
+                        cleanTitle = parts[0].trim();
+                      } else if (titleText.includes(':')) {
+                        const parts = titleText.split(':');
+                        cleanTitle = parts[0].trim();
+                      }
+                      
+                      // 确保title对象存在
+                      if (!optionCopy.title) {
+                        optionCopy.title = {};
+                      }
+                      
+                      // 设置新的标题文本
+                      optionCopy.title.text = `${index + 1}. ${cleanTitle}`;
+                      
+                      return (
+                        <div key={index} style={{ 
+                          border: `1px solid ${borderColor}`,
+                          borderRadius: '4px', 
+                          padding: '8px',
+                          boxShadow: '0 2px 8px rgba(0, 0, 0, 0.06)'
+                        }}>
+                          {/* <Typography.Title level={5} style={{ 
+                            marginBottom: '8px',
+                            color: borderColor
+                          }}>
+                            {optionCopy.title.text}
+                          </Typography.Title> */}
+                          <ReactECharts
+                            option={optionCopy}
+                            style={{ height: '300px', width: '100%' }}
+                            notMerge={true}
+                            lazyUpdate={true}
+                          />
+                        </div>
+                      );
+                    })}
                   </div>
                 </Card>
               )}
@@ -504,33 +672,71 @@ const ChartAnalyzer: React.FC<ChartAnalyzerProps> = ({ models }) => {
                 <Collapse>
                   <Panel header="查看完整配置" key="1">
                     <Tabs defaultActiveKey="1">
-                      <Tabs.TabPane tab="主图表" key="1">
+                      <Tabs.TabPane 
+                        tab={
+                          <span style={{ color: '#5470c6' }}>
+                            主图表
+                          </span>
+                        } 
+                        key="1"
+                      >
                         <pre style={{ 
                           maxHeight: '300px', 
                           overflow: 'auto', 
                           backgroundColor: '#f5f5f5', 
                           padding: '8px', 
                           borderRadius: '4px',
-                          fontSize: '12px'
+                          fontSize: '12px',
+                          borderLeft: '3px solid #5470c6'
                         }}>
                           {JSON.stringify(chartOption, null, 2)}
                         </pre>
                       </Tabs.TabPane>
                       
-                      {chartOptions.length > 1 && chartOptions.map((option, index) => (
-                        <Tabs.TabPane tab={`图表 ${index + 1}`} key={`${index + 2}`}>
-                          <pre style={{ 
-                            maxHeight: '300px', 
-                            overflow: 'auto', 
-                            backgroundColor: '#f5f5f5', 
-                            padding: '8px', 
-                            borderRadius: '4px',
-                            fontSize: '12px'
-                          }}>
-                            {JSON.stringify(option, null, 2)}
-                          </pre>
-                        </Tabs.TabPane>
-                      ))}
+                      {chartOptions.length > 1 && chartOptions.map((option, index) => {
+                        // 使用与其他部分相同的颜色方案
+                        const colorScheme = COLOR_SCHEMES[index % COLOR_SCHEMES.length];
+                        
+                        const mainColor = colorScheme[0];
+                        
+                        // 处理标题去重
+                        let titleText = option.title?.text || `图表 ${index + 1}`;
+                        
+                        // 从标题中提取关键部分，避免重复
+                        let cleanTitle = titleText;
+                        if (titleText.includes('-')) {
+                          const parts = titleText.split('-');
+                          cleanTitle = parts[0].trim();
+                        } else if (titleText.includes('：')) {
+                          const parts = titleText.split('：');
+                          cleanTitle = parts[0].trim();
+                        } else if (titleText.includes(':')) {
+                          const parts = titleText.split(':');
+                          cleanTitle = parts[0].trim();
+                        }
+                        
+                        const tabTitle = (
+                          <span style={{ color: mainColor }}>
+                            {index + 1}. {cleanTitle}
+                          </span>
+                        );
+                        
+                        return (
+                          <Tabs.TabPane tab={tabTitle} key={`${index + 2}`}>
+                            <pre style={{ 
+                              maxHeight: '300px', 
+                              overflow: 'auto', 
+                              backgroundColor: '#f5f5f5', 
+                              padding: '8px', 
+                              borderRadius: '4px',
+                              fontSize: '12px',
+                              borderLeft: `3px solid ${mainColor}`
+                            }}>
+                              {JSON.stringify(option, null, 2)}
+                            </pre>
+                          </Tabs.TabPane>
+                        );
+                      })}
                     </Tabs>
                   </Panel>
                 </Collapse>
