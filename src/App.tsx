@@ -224,6 +224,19 @@ function App() {
     secret: ''
   });
 
+  const [collapsed, setCollapsed] = useState(false);
+  const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
+
+  // 监听窗口大小变化
+  useEffect(() => {
+    const handleResize = () => {
+      setIsMobile(window.innerWidth <= 768);
+    };
+
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+
   // 在App函数中第一个useEffect钩子添加设置页面标题的代码
   useEffect(() => {
     // 设置页面标题
@@ -663,57 +676,73 @@ function App() {
       <Header className="header">
         <div className="header-content">
           <div className="logo">
+            {isMobile && (
+              <Button
+                type="text"
+                icon={collapsed ? <MenuUnfoldOutlined /> : <MenuFoldOutlined />}
+                onClick={() => setCollapsed(!collapsed)}
+                style={{ color: 'white', fontSize: '16px', marginRight: '8px' }}
+              />
+            )}
             <DashboardOutlined style={{ fontSize: '24px', color: 'white', marginRight: '8px' }} />
             <Typography.Title level={4} style={{ margin: 0, color: 'white' }}>Mars模型评测平台</Typography.Title>
           </div>
           
-          <Menu 
-            theme="dark" 
-            mode="horizontal" 
-            selectedKeys={[activeTab]}
-            onSelect={({ key }) => setActiveTab(key as string)}
-            style={{ 
-              background: 'transparent', 
-              borderBottom: 'none',
-              flex: 1
-            }}
-          >
-            <Menu.Item key="compare" icon={<SyncOutlined />}>
-              模型比较
-            </Menu.Item>
-            <Menu.Item key="batch" icon={<FileExcelOutlined />}>
-              批量数据评测
-            </Menu.Item>
-            <Menu.Item key="prompts" icon={<FileTextOutlined />}>
-              提示词模板
-            </Menu.Item>
-            <Menu.Item key="excel" icon={<TableOutlined />}>
-              Excel处理
-            </Menu.Item>
-            <Menu.Item key="judgment" icon={<AuditOutlined />}>
-              模型处理结果评测
-            </Menu.Item>
-            <Menu.Item key="chart" icon={<BarChartOutlined />}>
-              数据分析与图表
-            </Menu.Item>
-            <Menu.Item key="image" icon={<CameraOutlined />}>
-              图像分析
-            </Menu.Item>
-            <Menu.Item key="settings" icon={<SettingOutlined />}>
-              模型配置
-            </Menu.Item>
-            <Menu.Item key="saved" icon={<HistoryOutlined />}>
-              历史记录
-            </Menu.Item>
-            <Menu.Item key="feishu" icon={<SendOutlined />}>
-              系统通知配置
-            </Menu.Item>
-          </Menu>
+          {/* 在非移动端或者菜单展开状态下显示菜单 */}
+          {(!isMobile || !collapsed) && (
+            <Menu 
+              theme="dark" 
+              mode={isMobile ? "inline" : "horizontal"}
+              selectedKeys={[activeTab]}
+              onSelect={({ key }) => {
+                setActiveTab(key as string);
+                if (isMobile) setCollapsed(true);
+              }}
+              style={{ 
+                background: 'transparent', 
+                borderBottom: 'none',
+                flex: 1
+              }}
+            >
+              <Menu.Item key="compare" icon={<SyncOutlined />}>
+                模型比较
+              </Menu.Item>
+              <Menu.Item key="batch" icon={<FileExcelOutlined />}>
+                批量数据评测
+              </Menu.Item>
+              <Menu.Item key="prompts" icon={<FileTextOutlined />}>
+                提示词模板
+              </Menu.Item>
+              <Menu.Item key="excel" icon={<TableOutlined />}>
+                Excel处理
+              </Menu.Item>
+              <Menu.Item key="judgment" icon={<AuditOutlined />}>
+                模型处理结果评测
+              </Menu.Item>
+              <Menu.Item key="chart" icon={<BarChartOutlined />}>
+                数据分析与图表
+              </Menu.Item>
+              <Menu.Item key="image" icon={<CameraOutlined />}>
+                图像分析
+              </Menu.Item>
+              <Menu.Item key="settings" icon={<SettingOutlined />}>
+                模型配置
+              </Menu.Item>
+              <Menu.Item key="saved" icon={<HistoryOutlined />}>
+                历史记录
+              </Menu.Item>
+              <Menu.Item key="feishu" icon={<SendOutlined />}>
+                系统通知配置
+              </Menu.Item>
+            </Menu>
+          )}
           
           <Space className="header-actions">
-            <Tooltip title="使用帮助">
-              <Button type="text" icon={<CodeOutlined />} style={{ color: 'white' }} />
-            </Tooltip>
+            {!isMobile && (
+              <Tooltip title="使用帮助">
+                <Button type="text" icon={<CodeOutlined />} style={{ color: 'white' }} />
+              </Tooltip>
+            )}
             <Dropdown menu={{ 
               items: [
                 {
@@ -730,7 +759,12 @@ function App() {
                   key: '3',
                   label: '关于',
                   icon: <TeamOutlined />
-                }
+                },
+                ...(isMobile ? [{
+                  key: '4',
+                  label: '使用帮助',
+                  icon: <CodeOutlined />
+                }] : [])
               ] 
             }}>
               <Avatar style={{ backgroundColor: 'rgba(255,255,255,0.2)', cursor: 'pointer' }} icon={<ToolOutlined />} />
@@ -772,12 +806,14 @@ function App() {
                       onSpeakerMapChange={setSpeakerMap}
                     />
                   </div>
-                  <ComparisonResults
-                    isLoading={isLoading}
-                    responses={responses}
-                    prompt={currentPrompt}
-                    input={currentInput}
-                  />
+                  <div className="results-container">
+                    <ComparisonResults
+                      isLoading={isLoading}
+                      responses={responses}
+                      prompt={currentPrompt}
+                      input={currentInput}
+                    />
+                  </div>
                 </div>
               </div>
             )}
