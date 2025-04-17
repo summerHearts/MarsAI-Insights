@@ -255,4 +255,4 @@ Mars模型评测平台采用[MIT许可证](LICENSE)。
 
 如有问题或建议，请通过以下方式联系：
 - 邮箱：jkyaoyajie@gmail.com
-- GitHub Issues: https://github.com/yourusername/mars-model-evaluation/issues
+- GitHub Issues: https://github.com/summerHearts/MarsAI-Insights/issues
