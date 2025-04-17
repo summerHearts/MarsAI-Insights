@@ -119,7 +119,7 @@ Excel处理模块提供了便捷的表格数据处理功能，支持数据清洗
 ## 目录结构
 
 ```
-mars-model-evaluation/
+MarsAI-Insights/
 ├── public/                 # 静态资源文件
 ├── src/                    # 源代码
 │   ├── components/         # React组件
@@ -153,8 +153,8 @@ mars-model-evaluation/
 
 ```bash
 # 克隆项目
-git clone https://github.com/yourusername/mars-model-evaluation.git
-cd mars-model-evaluation
+git clone https://github.com/summerHearts/MarsAI-Insights.git
+cd MarsAI-Insights
 
 # 安装依赖
 npm install
