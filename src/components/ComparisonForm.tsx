@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
-import { Button, Card, Form, Input, Select, Space, Spin, Tag, Row, Col, Tooltip, Divider, Switch, Collapse, Checkbox, Typography } from 'antd';
-import { SendOutlined, SaveOutlined, CopyOutlined, FileTextOutlined, ClearOutlined, InfoCircleOutlined, StarOutlined, FilterOutlined, SettingOutlined } from '@ant-design/icons';
+import { Button, Card, Form, Input, Select, Space, Spin, Tag, Row, Col, Tooltip, Divider, Switch, Collapse, Checkbox, Typography, Badge } from 'antd';
+import { SendOutlined, SaveOutlined, CopyOutlined, FileTextOutlined, ClearOutlined, InfoCircleOutlined, StarOutlined, FilterOutlined, SettingOutlined, RocketOutlined, ThunderboltOutlined } from '@ant-design/icons';
 import { Model } from '../types';
 
 const { Panel } = Collapse;
@@ -112,11 +112,13 @@ const ComparisonForm: React.FC<ComparisonFormProps> = ({
     <Card 
       title={
         <Space>
-          <FileTextOutlined />
-          <span>评测配置</span>
+          <RocketOutlined style={{ color: '#5B8FF9' }} />
+          <span className="card-title">评测配置</span>
         </Space>
       } 
       className="comparison-form-card"
+      bordered={false}
+      style={{ boxShadow: '0 4px 12px rgba(0, 0, 0, 0.05)', borderRadius: '12px' }}
     >
       <Form 
         layout="vertical" 
@@ -127,9 +129,10 @@ const ComparisonForm: React.FC<ComparisonFormProps> = ({
           <Col xs={24} lg={24}>
             <Form.Item
               label={
-                <Space>
-                  <span>选择要评测的模型</span>
-                  <Tooltip title="请选择一个或多个需要比较的模型">
+                <Space className="form-label">
+                  <Badge color="#8B5CF6" />
+                  <span>要评测的模型</span>
+                  <Tooltip title="选择一个或多个需要比较的模型以进行性能评估">
                     <InfoCircleOutlined style={{ color: '#8B5CF6' }} />
                   </Tooltip>
                   <div style={{ flex: 1 }} />
@@ -149,6 +152,8 @@ const ComparisonForm: React.FC<ComparisonFormProps> = ({
                 onChange={handleModelsChange}
                 style={{ width: '100%' }}
                 optionFilterProp="label"
+                popupMatchSelectWidth={false}
+                dropdownStyle={{ padding: '8px', borderRadius: '8px' }}
                 options={models
                   .sort((a, b) => {
                     // 免费模型排在前面
@@ -170,13 +175,17 @@ const ComparisonForm: React.FC<ComparisonFormProps> = ({
                   const model = models.find(m => m.id === props.value);
                   return (
                     <Tag
-                      color={model?.tags?.includes('免费') ? 'green' : 'blue'}
+                      color={model?.tags?.includes('免费') ? 'success' : 'processing'}
                       closable={props.closable}
                       onClose={props.onClose}
-                      style={{ marginRight: 3 }}
+                      style={{ 
+                        marginRight: 3, 
+                        borderRadius: '4px',
+                        padding: '2px 8px'
+                      }}
                     >
                       {model?.name || props.value}
-                      {model?.tags?.includes('免费') && <span style={{ marginLeft: 4 }}>⭐</span>}
+                      {model?.tags?.includes('免费') && <StarOutlined style={{ marginLeft: 4, fontSize: '12px' }} />}
                     </Tag>
                   );
                 }}
@@ -192,7 +201,8 @@ const ComparisonForm: React.FC<ComparisonFormProps> = ({
           <Col xs={24} lg={24}>
             <Form.Item 
               label={
-                <Space>
+                <Space className="form-label">
+                  <Badge color="#3B82F6" />
                   <span>提示词</span>
                   <Tooltip title="系统指令，定义模型的行为和任务">
                     <InfoCircleOutlined style={{ color: '#3B82F6' }} />
@@ -215,6 +225,13 @@ const ComparisonForm: React.FC<ComparisonFormProps> = ({
                 placeholder="请输入提示词系统指令，指导模型完成特定任务"
                 autoSize={{ minRows: 3, maxRows: 6 }}
                 className="prompt-textarea"
+                style={{ 
+                  borderRadius: '8px', 
+                  padding: '12px',
+                  fontSize: '14px',
+                  backgroundColor: '#f9fafb',
+                  transition: 'all 0.3s'
+                }}
               />
             </Form.Item>
           </Col>
@@ -224,18 +241,20 @@ const ComparisonForm: React.FC<ComparisonFormProps> = ({
           <Col xs={24} lg={24}>
             <Form.Item 
               label={
-                <Space>
+                <Space className="form-label">
+                  <Badge color="#10B981" />
                   <span>输入内容</span>
                   <Tooltip title="用户提供的具体问题或需要处理的内容">
                     <InfoCircleOutlined style={{ color: '#10B981' }} />
                   </Tooltip>
                   <div style={{ flex: 1 }} />
                   <Space>
-                    <span>启用文本预处理</span>
+                    <span className="preprocess-label">文本预处理</span>
                     <Switch 
                       checked={enablePreprocess}
                       onChange={handlePreprocessChange}
                       size="small"
+                      className="custom-switch"
                     />
                     <Tooltip title="开启后将对输入文本进行预处理，如清理空格、格式化等">
                       <InfoCircleOutlined style={{ color: '#EC4899' }} />
@@ -262,189 +281,145 @@ const ComparisonForm: React.FC<ComparisonFormProps> = ({
                 </Space>
               }
             >
-              {enablePreprocess && showPreprocessOptions && (
-                <div style={{ marginBottom: 16, background: '#f9f9f9', padding: 12, borderRadius: 6 }}>
-                  <Collapse bordered={false} defaultActiveKey={['1']}>
-                    <Panel 
-                      header={
-                        <span>
-                          <FilterOutlined style={{ marginRight: 8 }} />
-                          文本预处理选项
-                        </span>
-                      } 
-                      key="1"
-                    >
-                      <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-                        <Checkbox 
-                          checked={preprocessOptions.removeTimestamps}
-                          onChange={e => handlePreprocessOptionChange('removeTimestamps', e.target.checked)}
-                        >
-                          <Space>
-                            <span>去除时间戳</span>
-                            <Text type="secondary">[00::00::00-00::00::00]</Text>
-                          </Space>
-                        </Checkbox>
-                        
-                        <Checkbox 
-                          checked={preprocessOptions.removeHtmlTags}
-                          onChange={e => handlePreprocessOptionChange('removeHtmlTags', e.target.checked)}
-                        >
-                          <Space>
-                            <span>去除HTML标签</span>
-                            <Text type="secondary">&lt;tag&gt;内容&lt;/tag&gt;</Text>
-                          </Space>
-                        </Checkbox>
-                        
-                        <Checkbox 
-                          checked={preprocessOptions.normalizeWhitespace}
-                          onChange={e => handlePreprocessOptionChange('normalizeWhitespace', e.target.checked)}
-                        >
-                          <Space>
-                            <span>规范化空白字符</span>
-                            <Text type="secondary">清理多余空格和换行</Text>
-                          </Space>
-                        </Checkbox>
-                        
-                        <Checkbox 
-                          checked={preprocessOptions.removeDataMarkers}
-                          onChange={e => handlePreprocessOptionChange('removeDataMarkers', e.target.checked)}
-                        >
-                          <Space>
-                            <span>去除数据标记</span>
-                            <Text type="secondary">[DATA], &lt;DATA&gt;, [123]</Text>
-                          </Space>
-                        </Checkbox>
-                        
-                        <Checkbox 
-                          checked={preprocessOptions.removeSpecialChars}
-                          onChange={e => handlePreprocessOptionChange('removeSpecialChars', e.target.checked)}
-                        >
-                          <Space>
-                            <span>去除特殊字符</span>
-                            <Text type="secondary">控制字符和不可见字符</Text>
-                          </Space>
-                        </Checkbox>
-                        
-                        <Checkbox 
-                          checked={preprocessOptions.enhanceRoles}
-                          onChange={e => handlePreprocessOptionChange('enhanceRoles', e.target.checked)}
-                        >
-                          <Space>
-                            <span>角色增强</span>
-                            <Text type="secondary">将对话转换为结构化JSON数据</Text>
-                          </Space>
-                        </Checkbox>
-                        
-                        {preprocessOptions.enhanceRoles && (
-                          <div style={{ marginTop: '16px', borderTop: '1px dashed #d9d9d9', paddingTop: '16px' }}>
-                            <Text strong>角色映射配置：</Text>
-                            <div style={{ marginTop: '8px' }}>
-                              <Input.TextArea
-                                value={JSON.stringify(speakerMap, null, 2)}
-                                onChange={e => {
-                                  try {
-                                    const newMap = JSON.parse(e.target.value);
-                                    if (typeof newMap === 'object' && newMap !== null && !Array.isArray(newMap)) {
-                                      onSpeakerMapChange && onSpeakerMapChange(newMap);
-                                    }
-                                  } catch (error) {
-                                    // 解析错误，不更新状态
-                                    console.error('角色映射配置格式错误:', error);
-                                  }
-                                }}
-                                placeholder='{"司机": "司机", "用户": "用户"}'
-                                autoSize={{ minRows: 4, maxRows: 8 }}
-                                style={{ fontFamily: 'monospace' }}
-                              />
-                              <Text type="secondary" style={{ fontSize: '12px', display: 'block', marginTop: '4px' }}>
-                                JSON格式，用于将原文中的角色名映射为标准角色名
-                              </Text>
-                              
-                              <div style={{ marginTop: '8px' }}>
-                                <Button 
-                                  size="small" 
-                                  type="link" 
-                                  onClick={() => {
-                                    const testText = `司机[0::0::0-0::9::310]:喂，你重新换个车啊，这个单子我我他你帮我排3点几公里帮我排个单子嘞。
-司机[0::9::310-0::14::220]:好，好晕了。`;
-                                    onInputChange(testText);
-                                  }}
-                                >
-                                  插入测试对话
-                                </Button>
-                              </div>
-                            </div>
-                          </div>
-                        )}
-                      </div>
-                    </Panel>
-                  </Collapse>
-                </div>
-              )}
-              
               <Input.TextArea
                 value={currentInput}
                 onChange={e => onInputChange(e.target.value)}
-                placeholder="请输入需要模型处理的具体内容、问题或任务"
-                autoSize={{ minRows: 4, maxRows: 10 }}
+                placeholder="请输入需要处理的具体内容、问题或任务"
+                autoSize={{ minRows: 5, maxRows: 15 }}
                 className="input-textarea"
+                style={{ 
+                  borderRadius: '8px', 
+                  padding: '12px',
+                  fontSize: '14px',
+                  backgroundColor: '#f9fafb',
+                  transition: 'all 0.3s'
+                }}
               />
             </Form.Item>
           </Col>
         </Row>
 
-        <Divider style={{ margin: '12px 0 24px' }} />
+        {enablePreprocess && showPreprocessOptions && (
+          <Row gutter={24}>
+            <Col span={24}>
+              <Card
+                size="small"
+                className="preprocess-options-card"
+                style={{ 
+                  marginBottom: 16, 
+                  backgroundColor: '#f9fafb', 
+                  borderRadius: '8px',
+                  boxShadow: 'none',
+                  border: '1px solid #e5e7eb'
+                }}
+              >
+                <Row gutter={[16, 8]}>
+                  <Col span={8}>
+                    <Checkbox
+                      checked={preprocessOptions?.removeTimestamps}
+                      onChange={e => handlePreprocessOptionChange('removeTimestamps', e.target.checked)}
+                    >
+                      <Tooltip title="移除文本中的时间戳标记">
+                        <Text>移除时间戳</Text>
+                      </Tooltip>
+                    </Checkbox>
+                  </Col>
+                  <Col span={8}>
+                    <Checkbox
+                      checked={preprocessOptions?.removeHtmlTags}
+                      onChange={e => handlePreprocessOptionChange('removeHtmlTags', e.target.checked)}
+                    >
+                      <Tooltip title="移除HTML标签，保留文本内容">
+                        <Text>移除HTML标签</Text>
+                      </Tooltip>
+                    </Checkbox>
+                  </Col>
+                  <Col span={8}>
+                    <Checkbox
+                      checked={preprocessOptions?.normalizeWhitespace}
+                      onChange={e => handlePreprocessOptionChange('normalizeWhitespace', e.target.checked)}
+                    >
+                      <Tooltip title="规范化空白字符，如多个空格合并为一个">
+                        <Text>规范化空白</Text>
+                      </Tooltip>
+                    </Checkbox>
+                  </Col>
+                  <Col span={8}>
+                    <Checkbox
+                      checked={preprocessOptions?.removeDataMarkers}
+                      onChange={e => handlePreprocessOptionChange('removeDataMarkers', e.target.checked)}
+                    >
+                      <Tooltip title="移除数据标记符号">
+                        <Text>移除数据标记</Text>
+                      </Tooltip>
+                    </Checkbox>
+                  </Col>
+                  <Col span={8}>
+                    <Checkbox
+                      checked={preprocessOptions?.removeSpecialChars}
+                      onChange={e => handlePreprocessOptionChange('removeSpecialChars', e.target.checked)}
+                    >
+                      <Tooltip title="移除特殊字符">
+                        <Text>移除特殊字符</Text>
+                      </Tooltip>
+                    </Checkbox>
+                  </Col>
+                  <Col span={8}>
+                    <Checkbox
+                      checked={preprocessOptions?.enhanceRoles}
+                      onChange={e => handlePreprocessOptionChange('enhanceRoles', e.target.checked)}
+                    >
+                      <Tooltip title="增强角色标识，使其更容易被模型识别">
+                        <Text>增强角色标识</Text>
+                      </Tooltip>
+                    </Checkbox>
+                  </Col>
+                </Row>
+              </Card>
+            </Col>
+          </Row>
+        )}
 
-        <Form.Item style={{ marginBottom: 0 }}>
-          <Space size="middle" wrap>
+        <Row gutter={16} style={{ marginTop: 16 }}>
+          <Col xs={24} sm={12}>
             <Button
               type="primary"
-              icon={<SendOutlined />}
+              icon={<ThunderboltOutlined />}
               onClick={handleSubmit}
               loading={isLoading}
-              disabled={!currentInput || selectedModelIds.length === 0}
-              size="large"
+              block
+              style={{ 
+                height: '40px', 
+                borderRadius: '8px',
+                background: 'linear-gradient(90deg, #1890ff 0%, #36cfc9 100%)',
+                border: 'none'
+              }}
             >
-              开始评测
+              {isLoading ? '评测中...' : '开始评测'}
             </Button>
-            <Tooltip title="保存当前评测结果，可在历史记录中查看">
-              <Button
-                icon={<SaveOutlined />}
-                onClick={onSaveResult}
-                disabled={isLoading || (models.length === 0)}
-                size="large"
-              >
-                保存结果
-              </Button>
-            </Tooltip>
-            <Tooltip title="保存当前输入和提示词，可在历史记录中查看">
-              <Button
-                icon={<StarOutlined />}
-                onClick={onSaveInput}
-                disabled={!currentInput && !currentPrompt}
-                size="large"
-              >
-                保存输入
-              </Button>
-            </Tooltip>
-            <Tooltip title="复制当前配置为JSON格式">
-              <Button
-                icon={<CopyOutlined />}
-                onClick={() => {
-                  const values = {
-                    prompt: currentPrompt,
-                    input: currentInput,
-                    models: selectedModelIds.map(id => models.find(m => m.id === id)?.name || id)
-                  };
-                  navigator.clipboard.writeText(JSON.stringify(values, null, 2));
-                }}
-                size="large"
-              >
-                复制配置
-              </Button>
-            </Tooltip>
-          </Space>
-        </Form.Item>
+          </Col>
+          <Col xs={12} sm={6}>
+            <Button
+              icon={<SaveOutlined />}
+              onClick={onSaveInput}
+              block
+              style={{ height: '40px', borderRadius: '8px' }}
+            >
+              保存输入
+            </Button>
+          </Col>
+          <Col xs={12} sm={6}>
+            <Button
+              icon={<SaveOutlined />}
+              onClick={onSaveResult}
+              disabled={isLoading}
+              block
+              style={{ height: '40px', borderRadius: '8px' }}
+            >
+              保存结果
+            </Button>
+          </Col>
+        </Row>
       </Form>
     </Card>
   );
