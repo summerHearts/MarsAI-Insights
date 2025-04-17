@@ -388,7 +388,7 @@ body {
 /* 响应式设计优化 */
 @media (max-width: 768px) {
   .ant-layout-content {
-    padding: 16px;
+    padding: 12px;
   }
   
   .ant-card-body {
@@ -397,7 +397,7 @@ body {
   
   .ant-table-thead > tr > th,
   .ant-table-tbody > tr > td {
-    padding: 12px 16px;
+    padding: 8px;
   }
   
   .ant-tabs-tab {
@@ -406,6 +406,265 @@ body {
   
   .batch-processing-section {
     padding: 16px;
+  }
+
+  /* 头部导航适配移动端 */
+  .header-content {
+    flex-direction: column;
+    padding: 8px 0;
+    height: auto;
+  }
+
+  .ant-layout-header {
+    height: auto;
+    line-height: normal;
+    padding: 8px 16px;
+  }
+
+  .header-actions {
+    margin-top: 8px;
+    width: 100%;
+    justify-content: flex-end;
+  }
+
+  .logo {
+    margin-bottom: 8px;
+    justify-content: center;
+    width: 100%;
+  }
+
+  /* 导航菜单适配移动端 */
+  .ant-menu.ant-menu-dark {
+    width: 100%;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+
+  .ant-menu-item {
+    padding: 0 8px !important;
+    margin: 2px !important;
+    font-size: 12px;
+  }
+
+  .ant-menu-item .anticon {
+    margin-right: 4px;
+    font-size: 14px;
+  }
+
+  /* 表单适配移动端 */
+  .main-layout {
+    flex-direction: column;
+  }
+
+  .form-container {
+    width: 100%;
+    margin-right: 0;
+    margin-bottom: 16px;
+  }
+
+  .comparison-form-card {
+    margin-bottom: 16px;
+  }
+
+  /* 响应式卡片布局 */
+  .model-card {
+    width: 100%;
+    margin-right: 0;
+  }
+
+  /* 响应式表单控件 */
+  .ant-form-item-label {
+    padding-bottom: 4px;
+  }
+
+  .ant-form-item {
+    margin-bottom: 12px;
+  }
+
+  .prompt-textarea, 
+  .input-textarea {
+    min-height: 100px;
+  }
+
+  /* 下拉菜单适配移动端 */
+  .ant-select-selector {
+    height: 36px !important;
+  }
+
+  /* 弹框适配移动端 */
+  .ant-modal {
+    max-width: 90%;
+    margin: 16px auto;
+  }
+
+  .ant-modal-body {
+    padding: 16px;
+  }
+
+  /* 响应式按钮组 */
+  .ant-space {
+    flex-wrap: wrap;
+  }
+
+  /* 适配移动端的表格 */
+  .ant-table {
+    overflow-x: auto;
+  }
+
+  /* 图表适配移动端 */
+  .chart-container {
+    height: 300px !important;
+  }
+
+  /* 主布局适配移动端 */
+  .main-layout {
+    margin: 0;
+    flex-direction: column;
+  }
+
+  .form-container,
+  .results-container {
+    flex: none;
+    width: 100%;
+    min-width: auto;
+    padding: 0;
+  }
+
+  /* 更多移动端内容布局优化 */
+  .tab-content {
+    padding: 0;
+  }
+
+  .page-header {
+    margin-bottom: 12px;
+  }
+
+  /* 移动端按钮优化 */
+  .button-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-bottom: 12px;
+  }
+
+  .button-container .ant-btn {
+    flex: 1;
+    min-width: calc(50% - 4px);
+  }
+
+  /* 移动端表格响应式处理 */
+  .ant-table-wrapper {
+    margin: 0 -12px;
+    width: calc(100% + 24px);
+  }
+
+  .ant-table-content {
+    overflow-x: auto;
+  }
+
+  /* 移动端卡片组样式 */
+  .card-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+
+  /* 移动端组件头部优化 */
+  .responsive-card-header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .responsive-card-title {
+    margin-bottom: 8px;
+    width: 100%;
+  }
+
+  .responsive-card-actions {
+    flex-direction: column;
+    width: 100%;
+  }
+
+  .responsive-card-actions .ant-space {
+    margin-bottom: 8px;
+    width: 100%;
+  }
+
+  /* 移动端卡片头部样式优化 */
+  .ant-card-head {
+    padding: 12px 16px;
+  }
+
+  .ant-card-head-wrapper {
+    flex-direction: column;
+  }
+
+  .ant-card-head-title {
+    padding: 8px 0;
+  }
+
+  .ant-card-extra {
+    margin-left: 0;
+    padding: 8px 0;
+    width: 100%;
+  }
+}
+
+/* 针对极小屏幕的适配 */
+@media (max-width: 480px) {
+  .ant-layout-content {
+    padding: 8px;
+  }
+
+  .site-layout-content {
+    padding: 12px 0;
+  }
+
+  .ant-card-body {
+    padding: 12px;
+  }
+
+  .ant-menu-item {
+    padding: 0 6px !important;
+    margin: 1px !important;
+    font-size: 11px;
+  }
+
+  .logo h4 {
+    font-size: 16px;
+  }
+
+  .ant-form-item-label > label {
+    font-size: 13px;
+  }
+
+  .ant-btn {
+    padding: 0 12px;
+    height: 32px;
+    font-size: 13px;
+  }
+
+  .page-header .ant-typography {
+    font-size: 18px;
+  }
+
+  /* 超小屏幕布局优化 */
+  .button-container .ant-btn {
+    flex: 100%;
+    width: 100%;
+  }
+
+  /* 调整表单项在超小屏幕的布局 */
+  .ant-form-item-label,
+  .ant-form-item-control {
+    flex: 0 0 100%;
+    max-width: 100%;
+    text-align: left;
+  }
+
+  .ant-form-item-control-input {
+    width: 100%;
   }
 }
 
@@ -617,4 +876,53 @@ pre {
 .page-header .anticon {
   margin-right: 8px;
   color: var(--primary-color);
+}
+
+.main-layout {
+  display: flex;
+  margin: 0 -12px;
+  flex-wrap: wrap;
+}
+
+.form-container {
+  flex: 1;
+  min-width: 400px;
+  padding: 0 12px;
+  margin-bottom: 24px;
+}
+
+.results-container {
+  flex: 1;
+  min-width: 400px;
+  padding: 0 12px;
+}
+
+/* 响应式组件头部 */
+.responsive-card-header {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+}
+
+.responsive-card-title {
+  margin-right: auto;
+}
+
+.responsive-card-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+/* 响应式表单操作按钮组 */
+.form-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 16px;
+}
+
+.form-actions .ant-btn {
+  flex-grow: 1;
 }
