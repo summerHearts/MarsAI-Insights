@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
-import { Card, Typography, Badge, Spin, Space, Button, Tooltip, Row, Col, Statistic, Divider, Switch, Tag, Alert } from 'antd';
-import { CopyOutlined, CloudDownloadOutlined, DownloadOutlined, LineChartOutlined, BarChartOutlined, CheckCircleOutlined, CloseCircleOutlined } from '@ant-design/icons';
+import { Card, Typography, Badge, Spin, Space, Button, Tooltip, Row, Col, Statistic, Divider, Switch, Tag, Alert, Empty } from 'antd';
+import { CopyOutlined, CloudDownloadOutlined, DownloadOutlined, LineChartOutlined, BarChartOutlined, CheckCircleOutlined, CloseCircleOutlined, CodeOutlined, ReadOutlined, RocketOutlined } from '@ant-design/icons';
 import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
 import { vscDarkPlus } from 'react-syntax-highlighter/dist/esm/styles/prism';
 import { ModelResponse } from '../types';
@@ -131,22 +131,30 @@ const ComparisonResults: React.FC<ComparisonResultsProps> = ({
       <div>
         {parts.map((part, index) => 
           part.type === 'text' ? (
-            <Paragraph key={index}>{part.content}</Paragraph>
+            <Paragraph key={index} className="result-text-content">{part.content}</Paragraph>
           ) : (
             <div key={index} className="code-block-container">
               <div className="code-block-header">
-                <Text strong style={{ color: '#e6e6e6' }}>{part.language}</Text>
+                <Space>
+                  <CodeOutlined style={{ color: '#e6e6e6' }} />
+                  <Text strong style={{ color: '#e6e6e6' }}>{part.language}</Text>
+                </Space>
                 <Button 
                   type="text" 
                   icon={<CopyOutlined />} 
                   size="small"
                   onClick={() => copyToClipboard(part.content)}
+                  className="code-copy-btn"
                 />
               </div>
               <SyntaxHighlighter
                 language={part.language}
                 style={vscDarkPlus}
-                customStyle={{ margin: 0, borderRadius: '0 0 6px 6px' }}
+                customStyle={{ 
+                  margin: 0, 
+                  borderRadius: '0 0 8px 8px',
+                  fontSize: '14px'
+                }}
               >
                 {part.content}
               </SyntaxHighlighter>
@@ -164,7 +172,8 @@ const ComparisonResults: React.FC<ComparisonResultsProps> = ({
     <Card 
       title={
         <Space align="center">
-          <Title level={4} style={{ margin: 0 }}>模型输出结果比较</Title>
+          <RocketOutlined style={{ color: '#10B981', fontSize: '18px' }} />
+          <Title level={4} style={{ margin: 0 }}>模型输出结果</Title>
           {hasErrors && (
             <Tag color="error">部分响应出错</Tag>
           )}
@@ -172,228 +181,154 @@ const ComparisonResults: React.FC<ComparisonResultsProps> = ({
       } 
       loading={isLoading && responses.length === 0}
       className="results-card"
+      bordered={false}
+      style={{ 
+        borderRadius: '12px', 
+        boxShadow: '0 4px 12px rgba(0, 0, 0, 0.05)',
+        marginTop: '24px'
+      }}
       extra={
         <Space>
-          <Space align="center">
-            <Text type="secondary">显示系统提示词:</Text>
+          <Space align="center" className="view-option">
+            <Text type="secondary">系统提示词:</Text>
             <Switch 
               checked={showPrompt} 
               onChange={(checked) => setShowPrompt(checked)}
+              size="small"
             />
           </Space>
-          <Space align="center">
-            <Text type="secondary">使用实际模型名称:</Text>
+          {/* <Space align="center" className="view-option">
+            <Text type="secondary">实际模型名称:</Text>
             <Switch 
               checked={useRealModelName} 
               onChange={(checked) => setUseRealModelName(checked)}
+              size="small"
             />
-          </Space>
-          <Space align="center">
+          </Space> */}
+          <Space align="center" className="view-option">
             <Text type="secondary">代码高亮:</Text>
             <Switch 
               checked={codeBlockView} 
               onChange={(checked) => setCodeBlockView(checked)}
               defaultChecked
+              size="small"
             />
           </Space>
           <Tooltip title="复制所有结果为JSON">
             <Button 
               icon={<CopyOutlined />} 
               onClick={() => copyToClipboard(JSON.stringify(responses, null, 2))}
-            >
-              复制JSON
-            </Button>
-          </Tooltip>
-          <Tooltip title="导出完整数据">
-            <Button 
-              icon={<DownloadOutlined />} 
-              type="primary"
-              onClick={() => downloadAsJson({
-                modelId: 'all',
-                modelName: 'All Models',
-                responseTime: 0,
-                content: '',
-                rawResponse: {
-                  prompt,
-                  input,
-                  responses
-                }
-              })}
-            >
-              导出数据
-            </Button>
+            />
           </Tooltip>
         </Space>
       }
     >
-      <div style={{ marginBottom: 24 }}>
-        {showPrompt && (
-          <>
-            <Title level={5}>系统提示词</Title>
-            <Paragraph>{prompt || '无'}</Paragraph>
-          </>
-        )}
-        
-        <Title level={5}>输入内容</Title>
-        <Paragraph>
-          {responses[0]?.processedInput ? (
-            <>
-              <Text type="secondary">原始输入：</Text>
-              <Paragraph>{input}</Paragraph>
-              <Text type="secondary">预处理后：</Text>
-              <Paragraph>{responses[0].processedInput}</Paragraph>
-            </>
-          ) : (
-            input
-          )}
-        </Paragraph>
-      </div>
+      {isLoading && (
+        <div className="loading-container">
+          <Spin size="large" tip="正在等待模型响应..." />
+        </div>
+      )}
 
-      {isLoading && responses.length > 0 && (
-        <Alert
-          message="正在加载模型响应"
-          description="部分模型响应已加载完成，其他响应正在加载中..."
-          type="info"
-          showIcon
-          icon={<Spin size="small" />}
-          style={{ marginBottom: 16 }}
+      {!isLoading && responses.length === 0 && (
+        <Empty 
+          description="暂无模型输出结果"
+          image={Empty.PRESENTED_IMAGE_SIMPLE}
+          style={{ margin: '40px 0' }}
         />
       )}
 
-      {responses.length > 0 ? (
-        <>
-          <Card 
-            title={
-              <Space>
-                <LineChartOutlined />
-                <span>响应时间比较</span>
-              </Space>
-            }
-            className="performance-card"
-            size="small"
-            style={{ marginBottom: 24 }}
-          >
-            <div style={{ display: 'flex', alignItems: 'center', overflowX: 'auto', padding: '8px 0' }}>
-              {sortedResponses.map((response, index) => (
-                <div key={`${response.modelName}-${index}`} style={{ 
-                  marginRight: 16, 
-                  display: 'flex', 
-                  flexDirection: 'column', 
-                  alignItems: 'center',
-                  minWidth: '120px'
-                }}>
-                  <Badge 
-                    count={index + 1} 
-                    style={{ 
-                      backgroundColor: index === 0 ? '#10B981' : 
-                                       index === 1 ? '#3B82F6' : 
-                                       index === 2 ? '#8B5CF6' : '#64748B' 
-                    }} 
-                  />
-                  <Text style={{ margin: '8px 0', textAlign: 'center' }}>{response.modelName}</Text>
-                  <Statistic 
-                    value={response.responseTime / 1000} 
-                    precision={2} 
-                    suffix="秒"
-                    valueStyle={{ 
-                      color: index === 0 ? '#10B981' : 
-                             index === 1 ? '#3B82F6' : 
-                             index === 2 ? '#8B5CF6' : 
-                             index === sortedResponses.length - 1 ? '#EF4444' : '#64748B',
-                      fontSize: '18px'
-                    }}
-                  />
-                  {index === 0 && <Tag color="success" style={{ marginTop: 4 }}>最快</Tag>}
-                </div>
-              ))}
+      {showPrompt && prompt && !isLoading && (
+        <Alert
+          type="info"
+          message="系统提示词"
+          description={
+            <div className="prompt-container">
+              <pre>{prompt}</pre>
+              <Button 
+                icon={<CopyOutlined />}
+                type="text"
+                size="small"
+                onClick={() => copyToClipboard(prompt)}
+                className="copy-btn"
+              />
             </div>
-          </Card>
-
-          <Divider style={{ margin: '0 0 24px 0' }} />
-
-          <Row gutter={[24, 24]}>
-            {uniqueByModelName.map((response, index) => (
-              <Col xs={24} md={12} key={`${response.modelName}-${index}`}>
-                <Card 
-                  title={
-                    <div style={{ display: 'flex', alignItems: 'center' }}>
-                      <Badge 
-                        status={response.error ? 'error' : 'success'} 
-                        style={{ marginRight: 8 }}
-                      />
-                      <Space>
-                        <Text strong>{response.modelName}</Text>
-                        {!response.error && (
-                          <Tag 
-                            color={index === 0 ? 'success' : 'processing'} 
-                            style={{ marginLeft: 8 }}
-                          >
-                            {(response.responseTime / 1000).toFixed(2)}秒
-                          </Tag>
-                        )}
-                        {useRealModelName ? (
-                          <Text type="secondary" style={{ marginLeft: 8 }}>
-                            (实际: {getActualModelName(response)})
-                          </Text>
-                        ) : (
-                          <Text type="secondary" style={{ marginLeft: 8, fontSize: '12px' }}>
-                            {getActualModelName(response) !== response.modelName ? 
-                              `(实际: ${getActualModelName(response)})` : ''}
-                          </Text>
-                        )}
-                      </Space>
-                    </div>
-                  }
-                  className="model-card"
-                  extra={
-                    <Space>
-                      <Tooltip title="复制内容">
-                        <Button 
-                          type="text" 
-                          icon={<CopyOutlined />} 
-                          onClick={() => copyToClipboard(response.content)}
-                        />
-                      </Tooltip>
-                      <Tooltip title="下载完整响应">
-                        <Button 
-                          type="text" 
-                          icon={<CloudDownloadOutlined />} 
-                          onClick={() => downloadAsJson(response)}
-                        />
-                      </Tooltip>
-                    </Space>
-                  }
-                >
-                  {response.error ? (
-                    <Alert
-                      message="请求失败"
-                      description={response.content || "未能获取模型响应"}
-                      type="error"
-                      showIcon
-                      icon={<CloseCircleOutlined />}
-                    />
-                  ) : (
-                    <div className="response-content">
-                      {containsCodeBlock(response.content) ? (
-                        formatCodeBlocks(response.content)
-                      ) : (
-                        <Paragraph>{response.content}</Paragraph>
-                      )}
-                    </div>
-                  )}
-                </Card>
-              </Col>
-            ))}
-          </Row>
-        </>
-      ) : (
-        !isLoading && (
-          <div style={{ textAlign: 'center', padding: '40px 0' }}>
-            <Title level={5} type="secondary">暂无模型输出结果</Title>
-            <Paragraph type="secondary">选择模型并提供输入后点击"开始评测"按钮</Paragraph>
-          </div>
-        )
+          }
+          style={{ marginBottom: 24, borderRadius: '8px' }}
+        />
       )}
+
+      <Row gutter={[16, 16]}>
+        {!isLoading && (useRealModelName ? uniqueByModelName : responses).map((response, index) => (
+          <Col key={index} xs={24} lg={24}>
+            <Card
+              className="model-response-card"
+              style={{ 
+                borderRadius: '8px',
+                border: '1px solid #f0f0f0',
+                overflow: 'hidden'
+              }}
+              title={
+                <Space>
+                  <Tag 
+                    color={response.error ? 'error' : 'processing'} 
+                    style={{ 
+                      borderRadius: '12px', 
+                      padding: '0 12px',
+                      marginRight: '8px'
+                    }}
+                  >
+                    {useRealModelName ? getActualModelName(response) : response.modelName}
+                  </Tag>
+                  <Badge 
+                    status={response.error ? 'error' : 'success'} 
+                    text={response.error ? '调用失败' : '成功'} 
+                  />
+                  <Divider type="vertical" />
+                  <Text type="secondary">响应时间: {(response.responseTime / 1000).toFixed(2)}秒</Text>
+                </Space>
+              }
+              extra={
+                <Space>
+                  <Tooltip title="复制内容">
+                    <Button 
+                      icon={<CopyOutlined />}
+                      type="text"
+                      onClick={() => copyToClipboard(response.content)}
+                    />
+                  </Tooltip>
+                  <Tooltip title="下载为JSON">
+                    <Button 
+                      icon={<DownloadOutlined />}
+                      type="text"
+                      onClick={() => downloadAsJson(response)}
+                    />
+                  </Tooltip>
+                </Space>
+              }
+              bodyStyle={{ 
+                padding: response.error ? '16px' : '0',
+                backgroundColor: response.error ? '#fff2f0' : 'transparent'
+              }}
+            >
+              {response.error ? (
+                <Alert
+                  message="错误"
+                  description={response.error}
+                  type="error"
+                  showIcon
+                />
+              ) : (
+                <div className="response-content">
+                  {containsCodeBlock(response.content) ? 
+                    formatCodeBlocks(response.content) : 
+                    <div className="plain-text-content">{response.content}</div>
+                  }
+                </div>
+              )}
+            </Card>
+          </Col>
+        ))}
+      </Row>
     </Card>
   );
 };

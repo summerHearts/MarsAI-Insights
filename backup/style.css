@@ -1,0 +1,914 @@
+/* 基本容器样式 */
+.customer-assistant-container {
+  position: fixed;
+  bottom: 80px;
+  right: 20px;
+  width: 420px;
+  height: 550px;
+  max-width: 90vw;
+  max-height: 80vh;
+  border-radius: 10px;
+  box-shadow: 0 5px 20px rgba(0, 0, 0, 0.15);
+  z-index: 1000;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  background-color: #fff;
+  pointer-events: auto;
+  transition: all 0.3s ease;
+  animation: slide-in 0.4s ease-out;
+}
+
+.customer-assistant-container:hover {
+  box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2);
+  transform: translateY(-5px);
+}
+
+/* 客服按钮样式 */
+.assistant-button {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  width: 54px;
+  height: 54px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #2563eb, #0ea5e9);
+  color: white;
+  border: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 24px;
+  box-shadow: 0 6px 16px rgba(37, 99, 235, 0.35);
+  cursor: pointer;
+  z-index: 999;
+  transition: transform 0.3s, box-shadow 0.3s;
+  pointer-events: auto;
+  animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+  0% {
+    box-shadow: 0 0 0 0 rgba(37, 99, 235, 0.4);
+  }
+  70% {
+    box-shadow: 0 0 0 10px rgba(37, 99, 235, 0);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(37, 99, 235, 0);
+  }
+}
+
+/* 创建一个容器确保只有客服相关元素接收事件 */
+.assistant-wrapper {
+  position: fixed;
+  bottom: 0;
+  right: 0;
+  z-index: 999;
+  pointer-events: none; /* 让背景不接收事件，只有子元素接收 */
+  display: block;
+  width: 0;
+  height: 0;
+}
+
+.assistant-button:hover {
+  transform: translateY(-3px) scale(1.05);
+  box-shadow: 0 8px 20px rgba(37, 99, 235, 0.5);
+}
+
+.assistant-button:active {
+  transform: translateY(1px);
+  box-shadow: 0 2px 8px rgba(37, 99, 235, 0.2);
+}
+
+/* 聊天UI头部导航栏样式 */
+.customer-assistant-container .ChatApp-header {
+  flex-shrink: 0;
+  height: 60px;
+  background: linear-gradient(120deg, #1677ff, #2589ff);
+  color: white;
+  display: flex;
+  align-items: center;
+  padding: 0 16px;
+  position: relative;
+  z-index: 2;
+}
+
+.customer-assistant-container .Navbar-title {
+  font-size: 18px;
+  font-weight: 600;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+}
+
+.customer-assistant-container .Navbar-leftContent {
+  transition: transform 0.2s;
+}
+
+.customer-assistant-container .Navbar-leftContent:hover {
+  transform: scale(1.1);
+  opacity: 0.9;
+}
+
+/* 确保聊天窗口内部可以滚动 */
+.customer-assistant-container .ChatApp {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  isolation: isolate; /* 创建新的层叠上下文 */
+}
+
+/* 修复滚动问题 */
+.customer-assistant-container .Composer {
+  flex-shrink: 0;
+  padding: 12px;
+  border-top: 1px solid #eaeaea;
+  position: relative;
+  z-index: 2;
+  background: #fff;
+}
+
+.customer-assistant-container .MessageContainer {
+  flex: 1;
+  overflow-y: auto !important; /* 强制使用滚动条 */
+  overflow-x: hidden !important; /* 隐藏水平滚动条 */
+  padding: 16px;
+  -webkit-overflow-scrolling: touch !important; /* 增强iOS滚动 */
+  background-color: #f7f8fa;
+  background-image: linear-gradient(rgba(255, 255, 255, 0.8) 1px, transparent 1px),
+                    linear-gradient(90deg, rgba(255, 255, 255, 0.8) 1px, transparent 1px);
+  background-size: 20px 20px;
+  background-position: -1px -1px;
+  max-height: none !important; /* 移除可能存在的最大高度限制 */
+  min-height: 100px;
+  position: relative;
+  z-index: 1;
+  will-change: scroll-position; /* 提示浏览器优化滚动 */
+  transform: translateZ(0); /* 强制开启GPU加速 */
+  touch-action: pan-y; /* 只允许垂直滚动 */
+}
+
+/* 处理iOS上的滚动问题 */
+@supports (-webkit-touch-callout: none) {
+  .customer-assistant-container .MessageContainer {
+    -webkit-overflow-scrolling: touch !important; 
+  }
+}
+
+/* 防止聊天组件影响主应用样式 */
+.customer-assistant-container * {
+  box-sizing: border-box;
+}
+
+/* 确保主应用可以正常滚动 */
+body, html {
+  overflow: auto !important; /* 确保全局滚动不受影响 */
+  touch-action: auto !important; /* 确保全局触摸行为正常 */
+}
+
+/* 消息容器样式 */
+.customer-assistant-container .Message {
+  padding: 0;
+  margin-bottom: 20px;
+  display: flex;
+  align-items: flex-start;
+  width: 100%;
+  animation: message-fade-in 0.4s ease;
+}
+
+@keyframes message-fade-in {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* 右侧消息样式 - 用户 */
+.customer-assistant-container .Message--right {
+  flex-direction: row-reverse;
+  justify-content: flex-end;
+}
+
+/* 左侧消息样式 - 客服 */
+.customer-assistant-container .Message--left {
+  flex-direction: row;
+  justify-content: flex-start;
+}
+
+/* 头像样式 */
+.customer-assistant-container .Avatar {
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  margin: 0 10px;
+  overflow: hidden;
+  flex-shrink: 0;
+  background-color: #f0f0f0;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+  border: 2px solid white;
+}
+
+.customer-assistant-container .Avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.customer-assistant-container .Message--left .Avatar {
+  background: linear-gradient(135deg, #0ea5e9, #38bdf8);
+}
+
+/* 自定义用户头像样式 */
+.customer-assistant-container .Message--right .Avatar {
+  display: block; /* 显示用户头像 */
+  background: linear-gradient(135deg, #2563eb, #3b82f6);
+}
+
+/* 气泡基本样式 */
+.customer-assistant-container .Bubble {
+  position: relative;
+  display: inline-block;
+  border-radius: 16px;
+  padding: 12px 16px;
+  font-size: 15px;
+  line-height: 1.6;
+  word-break: break-word;
+  white-space: pre-wrap;
+  max-width: 85%;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+  transition: transform 0.2s, box-shadow 0.2s;
+  animation: bubble-pop 0.3s ease forwards;
+  transform-origin: bottom;
+}
+
+.customer-assistant-container .Bubble:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.08);
+}
+
+/* 左侧气泡样式 - 客服 */
+.customer-assistant-container .Bubble--left {
+  border-bottom-left-radius: 4px;
+  background-color: white;
+  border: 1px solid #eaeaea;
+}
+
+/* 右侧气泡样式 - 用户 */
+.customer-assistant-container .Bubble--right {
+  border-bottom-right-radius: 4px;
+  background-color: #1677ff;
+  color: white;
+}
+
+/* 确保消息气泡内容样式 */
+.customer-assistant-container .Bubble-content {
+  display: inline-block;
+  overflow: hidden;
+}
+
+/* 添加嵌套消息结构样式 */
+.customer-assistant-container .Message-main {
+  flex: 1;
+  margin: 0;
+  overflow: hidden;
+}
+
+.customer-assistant-container .Message--right .Message-main {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.customer-assistant-container .Message--left .Message-main {
+  display: flex;
+  justify-content: flex-start;
+}
+
+.customer-assistant-container .Message-inner {
+  display: flex;
+  flex-direction: column;
+  position: relative;
+}
+
+.customer-assistant-container .Message--right .Message-inner {
+  align-items: flex-end;
+}
+
+.customer-assistant-container .Message--left .Message-inner {
+  align-items: flex-start;
+}
+
+.customer-assistant-container .Message-content {
+  position: relative;
+}
+
+/* 修复右侧用户消息的气泡样式 */
+.customer-assistant-container .Message--right .Bubble.text {
+  border-bottom-right-radius: 4px;
+  background: linear-gradient(135deg, #2563eb, #3b82f6);
+  color: white;
+}
+
+/* 确保右侧气泡内容居右 */
+.customer-assistant-container .Message--right .Bubble-content {
+  text-align: right;
+}
+
+/* 卡片样式 */
+.customer-assistant-container .Card {
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  margin-bottom: 16px;
+  width: 95%;
+  margin-left: 8px;
+  border: 1px solid #f0f0f0;
+  transition: transform 0.3s, box-shadow 0.3s;
+}
+
+.customer-assistant-container .Card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.1);
+}
+
+.customer-assistant-container .custom-card-content {
+  padding: 8px 16px;
+}
+
+.customer-assistant-container .custom-card-content h4 {
+  margin: 8px 0 12px;
+  font-size: 16px;
+  font-weight: 500;
+  color: #333;
+}
+
+.customer-assistant-container .CardText h4 {
+  margin-top: 0;
+  color: #2563eb;
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.customer-assistant-container .List {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.customer-assistant-container .ListItem {
+  padding: 10px 14px;
+  border-bottom: 1px solid #f0f0f0;
+  font-size: 15px;
+  transition: background-color 0.2s, color 0.2s;
+}
+
+.customer-assistant-container .ListItem:last-child {
+  border-bottom: none;
+}
+
+.customer-assistant-container .ListItem:hover {
+  background-color: #f0f7ff;
+  color: #2563eb;
+  cursor: pointer;
+}
+
+/* 快速回复样式 */
+.customer-assistant-container .QuickReplies {
+  background-color: #fafbfc;
+  border-top: 1px solid #eaeaea;
+  padding: 12px 16px;
+}
+
+.customer-assistant-container .QuickReplies-list {
+  display: flex;
+  flex-wrap: nowrap;
+  padding: 0 4px;
+}
+
+.customer-assistant-container .QuickReply {
+  background-color: #f0f7ff;
+  border: 1px solid #d0e1ff;
+  border-radius: 18px;
+  padding: 6px 14px;
+  margin-right: 8px;
+  margin-bottom: 8px;
+  transition: all 0.2s;
+}
+
+.customer-assistant-container .QuickReply:hover {
+  background-color: #e0efff;
+  border-color: #b8d4ff;
+  transform: translateY(-1px);
+}
+
+.customer-assistant-container .QuickReply:active {
+  transform: translateY(1px);
+}
+
+/* 输入区域样式 */
+.customer-assistant-container .Composer-input {
+  border-radius: 20px;
+  padding: 10px 16px;
+  background-color: #f5f7fa;
+  border: 1px solid #eaeaea;
+  transition: all 0.2s;
+}
+
+.customer-assistant-container .Composer-input:focus {
+  background-color: #fff;
+  border-color: #b8d4ff;
+  box-shadow: 0 0 0 3px rgba(22, 119, 255, 0.1);
+}
+
+.customer-assistant-container .Composer-sendButton {
+  background-color: #1677ff;
+  border-radius: 50%;
+  width: 38px;
+  height: 38px;
+  box-shadow: 0 2px 6px rgba(22, 119, 255, 0.3);
+  transition: all 0.2s;
+  position: relative;
+  overflow: hidden;
+}
+
+.customer-assistant-container .Composer-sendButton::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: radial-gradient(circle, rgba(255,255,255,0.3) 0%, rgba(255,255,255,0) 70%);
+  opacity: 0;
+  transition: opacity 0.5s;
+}
+
+.customer-assistant-container .Composer-sendButton:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(22, 119, 255, 0.4);
+}
+
+.customer-assistant-container .Composer-sendButton:hover::after {
+  opacity: 1;
+  animation: pulse 1.5s infinite;
+}
+
+.customer-assistant-container .Composer-sendButton:active {
+  transform: translateY(0);
+  box-shadow: 0 1px 3px rgba(22, 119, 255, 0.2);
+}
+
+/* 打字指示器样式 */
+.customer-assistant-container .Typing {
+  padding: 12px;
+  border-radius: 16px;
+  background-color: white;
+  border: 1px solid #eaeaea;
+  border-bottom-left-radius: 4px;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+  max-width: 60px;
+}
+
+.customer-assistant-container .Typing-dot {
+  background-color: #999;
+  width: 7px;
+  height: 7px;
+  animation: typing-dot 1.4s infinite ease-in-out;
+}
+
+.customer-assistant-container .Typing-dot:nth-child(1) { animation-delay: 0s; }
+.customer-assistant-container .Typing-dot:nth-child(2) { animation-delay: 0.2s; }
+.customer-assistant-container .Typing-dot:nth-child(3) { animation-delay: 0.4s; }
+
+@keyframes typing-dot {
+  0%, 60%, 100% {
+    transform: translateY(0);
+    opacity: 0.6;
+  }
+  30% {
+    transform: translateY(-5px);
+    opacity: 1;
+  }
+}
+
+/* 系统消息样式 */
+.customer-assistant-container .MessageContainer > .Message.Message--system {
+  justify-content: center !important;
+  margin: 12px 0 20px;
+}
+
+.customer-assistant-container .SystemMessage {
+  background-color: rgba(0, 0, 0, 0.05);
+  color: #4b5563;
+  font-size: 14px;
+  font-weight: 500;
+  padding: 8px 16px;
+  border-radius: 16px;
+  display: inline-block;
+  max-width: 85%;
+  text-align: center;
+  margin: 0 auto;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
+  animation: system-message-fade-in 0.5s ease;
+}
+
+@keyframes system-message-fade-in {
+  from {
+    opacity: 0;
+    transform: translateY(-5px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* 确保系统消息正确居中 */
+.customer-assistant-container .MessageContainer > .Message.Message--system .Message-content {
+  display: flex;
+  justify-content: center;
+  width: 100%;
+}
+
+/* 隔离样式，防止与主应用冲突 */
+.customer-assistant-container {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+  line-height: 1.5;
+  color: #333;
+}
+
+/* 产品卡片相关样式 */
+.product-cards-container {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  margin: 12px 0;
+  width: 100%;
+  max-width: 95%;
+}
+
+.product-card {
+  background: white;
+  border-radius: 10px;
+  padding: 14px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+  border: 1px solid #eaeaea;
+  transition: all 0.3s ease;
+  animation: card-fade-in 0.5s ease forwards;
+  opacity: 0;
+}
+
+.product-card:nth-child(1) { animation-delay: 0.1s; }
+.product-card:nth-child(2) { animation-delay: 0.3s; }
+.product-card:nth-child(3) { animation-delay: 0.5s; }
+
+.product-card:hover {
+  box-shadow: 0 5px 15px rgba(22, 119, 255, 0.1);
+  transform: translateY(-3px);
+  border-color: #d0e1ff;
+}
+
+.product-card-header {
+  display: flex;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+.product-card-icon {
+  margin-right: 10px;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: linear-gradient(120deg, #e6f0ff, #d0e1ff);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
+  color: #1677ff;
+}
+
+.product-card-title {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 500;
+  color: #333;
+}
+
+.product-card-content {
+  margin-bottom: 12px;
+}
+
+.product-card-content p {
+  margin: 0;
+  font-size: 13px;
+  color: #666;
+  line-height: 1.5;
+}
+
+.product-card-actions {
+  display: flex;
+  gap: 8px;
+}
+
+.product-card-action-btn {
+  padding: 6px 12px;
+  background-color: #f0f7ff;
+  border: 1px solid #d0e1ff;
+  border-radius: 6px;
+  font-size: 12px;
+  color: #1677ff;
+  cursor: pointer;
+  transition: all 0.2s;
+  flex: 1;
+  text-align: center;
+}
+
+.product-card-action-btn:hover {
+  background-color: #e0efff;
+  color: #0057e5;
+  transform: translateY(-1px);
+}
+
+/* 快速回复按钮样式 */
+.customer-assistant-container .QuickReplies {
+  background-color: #fafbfc;
+  border-top: 1px solid #eaeaea;
+  padding: 12px 16px;
+}
+
+.customer-assistant-container .QuickReply {
+  background-color: #f0f7ff;
+  border: 1px solid #d0e1ff;
+  border-radius: 18px;
+  padding: 6px 14px;
+  margin-right: 8px;
+  margin-bottom: 8px;
+  transition: all 0.2s;
+}
+
+.customer-assistant-container .QuickReply:hover {
+  background-color: #e0efff;
+  border-color: #b8d4ff;
+  transform: translateY(-1px);
+}
+
+.customer-assistant-container .QuickReply:active {
+  transform: translateY(1px);
+}
+
+/* 输入框样式 */
+.customer-assistant-container .Composer-input {
+  border-radius: 20px;
+  padding: 10px 16px;
+  background-color: #f5f7fa;
+  border: 1px solid #eaeaea;
+  transition: all 0.2s;
+}
+
+.customer-assistant-container .Composer-input:focus {
+  background-color: #fff;
+  border-color: #b8d4ff;
+  box-shadow: 0 0 0 3px rgba(22, 119, 255, 0.1);
+}
+
+.customer-assistant-container .Composer-sendButton {
+  background-color: #1677ff;
+  border-radius: 50%;
+  width: 38px;
+  height: 38px;
+  box-shadow: 0 2px 6px rgba(22, 119, 255, 0.3);
+  transition: all 0.2s;
+  position: relative;
+  overflow: hidden;
+}
+
+.customer-assistant-container .Composer-sendButton::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: radial-gradient(circle, rgba(255,255,255,0.3) 0%, rgba(255,255,255,0) 70%);
+  opacity: 0;
+  transition: opacity 0.5s;
+}
+
+.customer-assistant-container .Composer-sendButton:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(22, 119, 255, 0.4);
+}
+
+.customer-assistant-container .Composer-sendButton:hover::after {
+  opacity: 1;
+  animation: pulse 1.5s infinite;
+}
+
+.customer-assistant-container .Composer-sendButton:active {
+  transform: translateY(0);
+  box-shadow: 0 1px 3px rgba(22, 119, 255, 0.2);
+}
+
+/* 动画效果 */
+@keyframes assistant-slide-in {
+  0% {
+    opacity: 0;
+    transform: translateY(30px) scale(0.9);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes pulse {
+  0% {
+    transform: scale(0.95);
+    opacity: 0.5;
+  }
+  50% {
+    transform: scale(1.05);
+    opacity: 0.8;
+  }
+  100% {
+    transform: scale(0.95);
+    opacity: 0.5;
+  }
+}
+
+@keyframes card-fade-in {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* 响应式样式 */
+@media (max-width: 480px) {
+  .customer-assistant-container {
+    width: 100%;
+    height: 100%;
+    bottom: 0;
+    right: 0;
+    border-radius: 0;
+  }
+  
+  .product-cards-container {
+    max-width: 100%;
+  }
+}
+
+/* 消息时间戳样式 */
+.message-time {
+  font-size: 11px;
+  color: #999;
+  margin-top: 4px;
+  padding-left: 8px;
+  padding-right: 8px;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  opacity: 0;
+  animation: fade-in 0.5s ease forwards;
+  animation-delay: 0.3s;
+}
+
+.Message--right .message-time {
+  justify-content: flex-end;
+  margin-right: 4px;
+}
+
+.Message--left .message-time {
+  justify-content: flex-start;
+  margin-left: 4px;
+}
+
+.message-time .anticon {
+  font-size: 10px;
+}
+
+@keyframes fade-in {
+  from {
+    opacity: 0;
+    transform: translateY(-5px);
+  }
+  to {
+    opacity: 0.85;
+    transform: translateY(0);
+  }
+}
+
+/* 系统消息样式 */
+.customer-assistant-container .Message.Message--center {
+  opacity: 0.85;
+  margin: 10px 0;
+}
+
+/* 常见问题卡片样式 */
+.customer-assistant-container .custom-card-content {
+  padding: 8px 16px;
+}
+
+.customer-assistant-container .custom-card-content h4 {
+  margin: 8px 0 12px;
+  font-size: 16px;
+  font-weight: 500;
+  color: #333;
+}
+
+.card-wrapper {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 12px;
+}
+
+.customer-assistant-container .List-item {
+  padding: 10px 8px;
+  border-radius: 8px;
+  margin-bottom: 4px;
+  transition: all 0.2s;
+  cursor: pointer;
+  font-size: 14px;
+  background-color: #f5f7fa;
+  border-left: 3px solid #e8e8e8;
+}
+
+.customer-assistant-container .List-item:hover {
+  background-color: #eef2f8;
+  border-left-color: #1677ff;
+  transform: translateX(2px);
+}
+
+/* 产品卡片样式 */
+.product-cards-wrapper {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 12px;
+}
+
+.product-cards-container {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  max-width: 280px;
+}
+
+/* 改进动画效果 */
+@keyframes slide-in {
+  from {
+    opacity: 0;
+    transform: translateY(20px) scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+/* 打字指示器动画优化 */
+@keyframes typing-dot {
+  0%, 60%, 100% {
+    transform: translateY(0);
+    opacity: 0.6;
+  }
+  30% {
+    transform: translateY(-5px);
+    opacity: 1;
+  }
+}
+
+/* 气泡样式优化 */
+.customer-assistant-container .Bubble {
+  position: relative;
+  display: inline-block;
+  border-radius: 16px;
+  padding: 12px 16px;
+  font-size: 15px;
+  line-height: 1.6;
+  word-break: break-word;
+  white-space: pre-wrap;
+  max-width: 85%;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+  transition: transform 0.2s, box-shadow 0.2s;
+  animation: bubble-pop 0.3s ease forwards;
+  transform-origin: bottom;
+}
+
+@keyframes bubble-pop {
+  from {
+    opacity: 0.5;
+    transform: scale(0.96);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
