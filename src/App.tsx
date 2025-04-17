@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Layout, Menu, Typography, Modal, Input, message, theme, Button, Dropdown, Space, Avatar, Tooltip } from 'antd';
+import { Layout, Menu, Typography, Modal, Input, message, theme, Button, Dropdown, Space, Avatar, Tooltip, Upload, Switch, Collapse, Checkbox } from 'antd';
 import { 
   SyncOutlined, 
   SettingOutlined, 
@@ -21,7 +21,8 @@ import {
   TableOutlined,
   AuditOutlined,
   BarChartOutlined,
-  SendOutlined
+  SendOutlined,
+  CameraOutlined
 } from '@ant-design/icons';
 import ModelConfig from './components/ModelConfig';
 import ComparisonForm from './components/ComparisonForm';
@@ -32,8 +33,9 @@ import BatchProcessing from './components/BatchProcessing';
 import ExcelProcessor from './components/ExcelProcessor';
 import JudgmentAnalyzer from './components/JudgmentAnalyzer';
 import ChartAnalyzer from './components/ChartAnalyzer';
+import ImageAnalyzer from './components/ImageAnalyzer';
 import { callModel } from './services/api';
-import { Model, ModelResponse, SavedComparison, SavedInput, BatchJob, ExcelItem } from './types';
+import { Model, ModelResponse, SavedComparison, SavedInput, BatchJob, ExcelItem, PreprocessOptions, SpeakerMap } from './types';
 import { 
   enhanceRoles, 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -132,6 +134,17 @@ const DEFAULT_MODELS: Model[] = [
     requestTemplate: '{"model": "doubao-1.5-turbo-32k-220615", "messages": [{"role": "system", "content": "{prompt}"}, {"role": "user", "content": "{input}"}]}',
     forceModelName: 'doubao-1.5-turbo-32k-220615',
     supportsStreaming: true
+  },
+  {
+    id: '10',
+    name: 'Qwen2.5-VL-32B (图像分析)',
+    baseUrl: 'https://api.openrouter.ai',
+    requestPath: '/api/v1/chat/completions',
+    requestTemplate: '{ "model": "qwen/qwen2.5-vl-32b-instruct:free", "messages": [{"role": "user", "content": [{"type": "text", "text": "{prompt}"}, {"type": "image_url", "image_url": {"url": "data:image/jpeg;base64,{image}"}}]}] }',
+    forceModelName: 'qwen/qwen2.5-vl-32b-instruct:free',
+    supportsStreaming: true,
+    apiKey: '请在这里填入您的OpenRouter API密钥',
+    tags: ['免费', 'VPN', '图像分析']
   }
 ];
 
@@ -683,6 +696,9 @@ function App() {
             <Menu.Item key="chart" icon={<BarChartOutlined />}>
               数据分析与图表
             </Menu.Item>
+            <Menu.Item key="image" icon={<CameraOutlined />}>
+              图像分析
+            </Menu.Item>
             <Menu.Item key="settings" icon={<SettingOutlined />}>
               模型配置
             </Menu.Item>
@@ -893,6 +909,18 @@ function App() {
                   config={feishuConfig} 
                   onChange={handleFeishuConfigChange} 
                 />
+              </div>
+            )}
+            
+            {activeTab === 'image' && (
+              <div className="tab-content">
+                <div className="page-header">
+                  <Typography.Title level={4}>
+                    <CameraOutlined /> 图像分析
+                  </Typography.Title>
+                  <Typography.Text type="secondary">分析图像，提取特征，辅助决策</Typography.Text>
+                </div>
+                <ImageAnalyzer models={models} />
               </div>
             )}
           </div>

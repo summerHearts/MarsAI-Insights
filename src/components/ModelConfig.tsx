@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
-import { Button, Card, Form, Input, Modal, Popconfirm, Space, Table, Tabs, Typography, Collapse, message, Switch } from 'antd';
-import { DeleteOutlined, EditOutlined, PlusOutlined, ReloadOutlined, ExportOutlined, ImportOutlined, CopyOutlined } from '@ant-design/icons';
+import { Button, Card, Form, Input, Modal, Popconfirm, Space, Table, Tabs, Typography, Collapse, message, Switch, Select, Tag, Dropdown } from 'antd';
+import { DeleteOutlined, EditOutlined, PlusOutlined, ReloadOutlined, ExportOutlined, ImportOutlined, CopyOutlined, DownOutlined } from '@ant-design/icons';
 import { Model } from '../types';
 
 const { TabPane } = Tabs;
@@ -25,7 +25,12 @@ const ModelConfig: React.FC<ModelConfigProps> = ({ models, onModelsChange }) => 
 
   const showEditModal = (model: Model) => {
     setEditingModel(model);
-    form.setFieldsValue(model);
+    setTimeout(() => {
+      form.setFieldsValue({
+        ...model,
+        tags: model.tags || []
+      });
+    }, 0);
     setIsModalVisible(true);
   };
 
@@ -36,10 +41,14 @@ const ModelConfig: React.FC<ModelConfigProps> = ({ models, onModelsChange }) => 
   const handleSave = async () => {
     try {
       const values = await form.validateFields();
+      
       if (editingModel) {
         // 编辑现有模型
         const updatedModels = models.map(m => 
-          m.id === editingModel.id ? { ...values, id: editingModel.id } : m
+          m.id === editingModel.id ? { 
+            ...values, 
+            id: editingModel.id,
+          } : m
         );
         onModelsChange(updatedModels);
         message.success('模型已更新，配置已自动保存');
@@ -79,7 +88,8 @@ const ModelConfig: React.FC<ModelConfigProps> = ({ models, onModelsChange }) => 
             baseUrl: 'https://dashscope.aliyuncs.com/compatible-mode',
             requestPath: '/v1/chat/completions',
             requestTemplate: '{"model": "qwen2.5-14b-instruct-1m", "messages": [{"role": "system", "content": "{prompt}"}, {"role": "user", "content": "{input}"}]}',
-            forceModelName: 'qwen2.5-14b-instruct-1m'
+            forceModelName: 'qwen2.5-14b-instruct-1m',
+            tags: ['收费', '国内可用', '思考型模型', 'Chat模型']
           },
           {
             id: '2',
@@ -87,7 +97,8 @@ const ModelConfig: React.FC<ModelConfigProps> = ({ models, onModelsChange }) => 
             baseUrl: 'https://api.openai.com',
             requestPath: '/v1/chat/completions',
             requestTemplate: '{"model": "gpt-3.5-turbo", "messages": [{"role": "user", "content": "{prompt}\\n\\n{input}"}]}',
-            forceModelName: 'gpt-3.5-turbo'
+            forceModelName: 'gpt-3.5-turbo',
+            tags: ['免费', 'VPN', 'Chat模型']
           },
           {
             id: '3',
@@ -95,7 +106,8 @@ const ModelConfig: React.FC<ModelConfigProps> = ({ models, onModelsChange }) => 
             baseUrl: 'https://dashscope.aliyuncs.com',
             requestPath: '/compatible-mode/v1/chat/completions',
             requestTemplate: '{"model": "qwen-plus", "messages": [{"role": "system", "content": "You are a helpful assistant."}, {"role": "user", "content": "{prompt}\\n\\n{input}"}]}',
-            forceModelName: 'qwen-plus'
+            forceModelName: 'qwen-plus',
+            tags: ['收费', '国内可用', 'Chat模型']
           },
           {
             id: '4',
@@ -103,7 +115,8 @@ const ModelConfig: React.FC<ModelConfigProps> = ({ models, onModelsChange }) => 
             baseUrl: 'https://dashscope.aliyuncs.com',
             requestPath: '/compatible-mode/v1/chat/completions',
             requestTemplate: '{"model": "qwen-turbo", "messages": [{"role": "system", "content": "You are a helpful assistant."}, {"role": "user", "content": "{prompt}\\n\\n{input}"}]}',
-            forceModelName: 'qwen-turbo'
+            forceModelName: 'qwen-turbo',
+            tags: ['国内可用', 'Chat模型']
           },
           {
             id: '5',
@@ -111,7 +124,8 @@ const ModelConfig: React.FC<ModelConfigProps> = ({ models, onModelsChange }) => 
             baseUrl: 'https://dashscope.aliyuncs.com/compatible-mode',
             requestPath: '/v1/chat/completions',
             requestTemplate: '{"model": "qwen2.5-32b-instruct", "messages": [{"role": "system", "content": "{prompt}"}, {"role": "user", "content": "{input}"}]}',
-            forceModelName: 'qwen2.5-32b-instruct'
+            forceModelName: 'qwen2.5-32b-instruct',
+            tags: ['收费', '国内可用', '思考型模型', 'Chat模型']
           },
           {
             id: '6',
@@ -119,7 +133,8 @@ const ModelConfig: React.FC<ModelConfigProps> = ({ models, onModelsChange }) => 
             baseUrl: 'https://api.deepseek.com',
             requestPath: '/v1/chat/completions',
             requestTemplate: '{"model": "deepseek-coder-v2", "messages": [{"role": "system", "content": "{prompt}"}, {"role": "user", "content": "{input}"}]}',
-            forceModelName: 'deepseek-coder-v2'
+            forceModelName: 'deepseek-coder-v2',
+            tags: ['收费', 'VPN', '代码', 'Chat模型']
           },
           {
             id: '7',
@@ -127,7 +142,19 @@ const ModelConfig: React.FC<ModelConfigProps> = ({ models, onModelsChange }) => 
             baseUrl: 'https://api.deepseek.com',
             requestPath: '/v1/chat/completions',
             requestTemplate: '{"model": "deepseek-chat", "messages": [{"role": "system", "content": "{prompt}"}, {"role": "user", "content": "{input}"}]}',
-            forceModelName: 'deepseek-chat'
+            forceModelName: 'deepseek-chat',
+            tags: ['收费', 'VPN', 'Chat模型']
+          },
+          {
+            id: '10',
+            name: 'Qwen2.5-VL-32B (图像分析)',
+            baseUrl: 'https://api.openrouter.ai',
+            requestPath: '/api/v1/chat/completions',
+            requestTemplate: '{ "model": "qwen/qwen2.5-vl-32b-instruct:free", "messages": [{"role": "user", "content": [{"type": "text", "text": "{prompt}"}, {"type": "image_url", "image_url": {"url": "data:image/jpeg;base64,{image}"}}]}] }',
+            forceModelName: 'qwen/qwen2.5-vl-32b-instruct:free',
+            supportsStreaming: true,
+            apiKey: '请在这里填入您的OpenRouter API密钥',
+            tags: ['免费', 'VPN', '图像分析', 'Chat模型']
           }
         ];
         
@@ -216,17 +243,106 @@ const ModelConfig: React.FC<ModelConfigProps> = ({ models, onModelsChange }) => 
     message.success('模型已复制，配置已自动保存');
   };
 
+  const createCommonModel = (type: string) => {
+    // 生成唯一ID
+    const id = Date.now().toString();
+    
+    let newModel: Model = {
+      id,
+      name: '',
+      baseUrl: '',
+      requestPath: '',
+      apiKey: '',
+      requestTemplate: '',
+      tags: []
+    };
+    
+    switch (type) {
+      case 'openrouter-qwen-vl':
+        newModel = {
+          id,
+          name: 'Qwen2.5-VL-32B (图像分析)',
+          baseUrl: 'https://api.openrouter.ai',
+          requestPath: '/api/v1/chat/completions',
+          requestTemplate: '{ "model": "qwen/qwen2.5-vl-32b-instruct:free", "messages": [{"role": "user", "content": [{"type": "text", "text": "{prompt}"}, {"type": "image_url", "image_url": {"url": "data:image/jpeg;base64,{image}"}}]}] }',
+          forceModelName: 'qwen/qwen2.5-vl-32b-instruct:free',
+          supportsStreaming: true,
+          apiKey: '',
+          tags: ['免费', 'VPN', '图像分析', 'Chat模型']
+        };
+        break;
+      case 'openai-gpt4':
+        newModel = {
+          id,
+          name: 'OpenAI GPT-4',
+          baseUrl: 'https://api.openai.com',
+          requestPath: '/v1/chat/completions',
+          requestTemplate: '{"model": "gpt-4", "messages": [{"role": "user", "content": "{prompt}\\n\\n{input}"}]}',
+          forceModelName: 'gpt-4',
+          apiKey: '',
+          tags: ['收费', 'VPN', '思考型模型', 'Chat模型']
+        };
+        break;
+      case 'qwen-turbo':
+        newModel = {
+          id,
+          name: '通义千问 Turbo',
+          baseUrl: 'https://dashscope.aliyuncs.com',
+          requestPath: '/compatible-mode/v1/chat/completions',
+          requestTemplate: '{"model": "qwen-turbo", "messages": [{"role": "system", "content": "You are a helpful assistant."}, {"role": "user", "content": "{prompt}\\n\\n{input}"}]}',
+          forceModelName: 'qwen-turbo',
+          apiKey: '',
+          tags: ['国内可用', 'Chat模型']
+        };
+        break;
+    }
+    
+    // 添加到模型列表
+    onModelsChange([...models, newModel]);
+    
+    // 编辑新添加的模型
+    setEditingModel(newModel);
+    setIsModalVisible(true);
+    
+    message.success('已创建模型模板，请填写API密钥');
+  };
+
   const columns = [
     {
       title: '模型名称',
       dataIndex: 'name',
       key: 'name',
+      render: (text: string, record: Model) => (
+        <div>
+          <span>{text}</span>
+          {record.disabled && <Tag color="red" style={{ marginLeft: 8 }}>已禁用</Tag>}
+        </div>
+      ),
     },
     {
-      title: 'Base URL',
+      title: '标签',
+      dataIndex: 'tags',
+      key: 'tags',
+      render: (tags: string[] | undefined) => (
+        <div>
+          {tags?.map(tag => {
+            let color = 'default';
+            if (tag === '免费') color = 'green';
+            if (tag === '收费') color = 'red';
+            if (tag === 'VPN') color = 'blue';
+            if (tag === '国内可用') color = 'gold';
+            if (tag === '图像分析') color = 'purple';
+            if (tag === '思考型模型') color = 'geekblue';
+            if (tag === 'Chat模型') color = 'cyan';
+            return <Tag color={color} key={tag} style={{ marginRight: 4 }}>{tag}</Tag>;
+          })}
+        </div>
+      ),
+    },
+    {
+      title: '基础URL',
       dataIndex: 'baseUrl',
       key: 'baseUrl',
-      ellipsis: true,
     },
     {
       title: '操作',
@@ -268,18 +384,37 @@ const ModelConfig: React.FC<ModelConfigProps> = ({ models, onModelsChange }) => 
       <Card 
         title="模型配置" 
         extra={
-          <Space>
-            <Button 
-              icon={<ImportOutlined />} 
-              onClick={handleImportModels}
+          <Space style={{ marginBottom: 16 }}>
+            <Button type="primary" icon={<PlusOutlined />} onClick={() => showAddModal()}>
+              添加模型
+            </Button>
+            <Dropdown
+              menu={{
+                items: [
+                  {
+                    key: 'openrouter-qwen-vl',
+                    label: 'OpenRouter Qwen2.5-VL (图像分析)',
+                  },
+                  {
+                    key: 'openai-gpt4',
+                    label: 'OpenAI GPT-4',
+                  },
+                  {
+                    key: 'qwen-turbo',
+                    label: '通义千问 Turbo',
+                  },
+                ],
+                onClick: ({ key }) => createCommonModel(key),
+              }}
             >
+              <Button icon={<PlusOutlined />}>
+                快速创建常用模型 <DownOutlined />
+              </Button>
+            </Dropdown>
+            <Button icon={<ImportOutlined />} onClick={handleImportModels}>
               导入配置
             </Button>
-            <Button 
-              icon={<ExportOutlined />} 
-              onClick={handleExportModels}
-              disabled={models.length === 0}
-            >
+            <Button icon={<ExportOutlined />} onClick={handleExportModels}>
               导出配置
             </Button>
             <Button 
@@ -288,13 +423,6 @@ const ModelConfig: React.FC<ModelConfigProps> = ({ models, onModelsChange }) => 
             >
               重置默认配置
             </Button>
-            <Button 
-              type="primary" 
-              icon={<PlusOutlined />} 
-              onClick={showAddModal}
-            >
-              添加模型
-            </Button>
           </Space>
         }
       >
@@ -302,7 +430,17 @@ const ModelConfig: React.FC<ModelConfigProps> = ({ models, onModelsChange }) => 
           <Text type="secondary">所有模型配置将自动保存到浏览器本地存储，应用重启后仍然保留。</Text>
         </div>
         <Table 
-          dataSource={models} 
+          dataSource={models.sort((a, b) => {
+            // 免费模型排在前面
+            const aIsFree = a.tags?.includes('免费') || false;
+            const bIsFree = b.tags?.includes('免费') || false;
+            
+            if (aIsFree && !bIsFree) return -1;
+            if (!aIsFree && bIsFree) return 1;
+            
+            // 免费状态相同，按名称排序
+            return a.name.localeCompare(b.name);
+          })} 
           columns={columns} 
           rowKey="id"
           pagination={false}
@@ -348,6 +486,29 @@ const ModelConfig: React.FC<ModelConfigProps> = ({ models, onModelsChange }) => 
             label="API 密钥"
           >
             <Input.Password placeholder="API Key (可选)" />
+          </Form.Item>
+
+          <Form.Item
+            name="tags"
+            label="模型标签"
+            tooltip="标记模型特性，如是否免费、是否需要VPN等"
+          >
+            <Select
+              mode="multiple"
+              style={{ width: '100%' }}
+              placeholder="请选择模型标签"
+              options={[
+                { label: '免费', value: '免费' },
+                { label: '收费', value: '收费' },
+                { label: 'VPN', value: 'VPN' },
+                { label: '国内可用', value: '国内可用' },
+                { label: '流式响应', value: '流式响应' },
+                { label: '图像分析', value: '图像分析' },
+                { label: '代码', value: '代码' },
+                { label: '思考型模型', value: '思考型模型' },
+                { label: 'Chat模型', value: 'Chat模型' }
+              ]}
+            />
           </Form.Item>
 
           <Collapse>

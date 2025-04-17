@@ -1256,11 +1256,25 @@ const BatchProcessing: React.FC<BatchProcessingProps> = ({
                       value={selectedModel}
                       onChange={setSelectedModel}
                     >
-                      {models.map(model => (
-                        <Option key={model.id} value={model.id}>
-                          {model.name}
-                        </Option>
-                      ))}
+                      {models
+                        .sort((a, b) => {
+                          // 免费模型排在前面
+                          const aIsFree = a.tags?.includes('免费') || false;
+                          const bIsFree = b.tags?.includes('免费') || false;
+                          
+                          if (aIsFree && !bIsFree) return -1;
+                          if (!aIsFree && bIsFree) return 1;
+                          
+                          // 免费状态相同，按名称排序
+                          return a.name.localeCompare(b.name);
+                        })
+                        .map(model => (
+                          <Option key={model.id} value={model.id}>
+                            {model.name} 
+                            {model.tags?.includes('免费') && <Tag color="green" style={{ marginLeft: 4 }}>免费</Tag>}
+                          </Option>
+                        ))
+                      }
                     </Select>
                   </div>
 
