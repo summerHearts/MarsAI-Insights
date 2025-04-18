@@ -165,11 +165,11 @@ const ScrollFixer = forwardRef((props: {children: React.ReactNode, onScroll?: (e
   return (
     <div 
       ref={innerRef} 
+      className="scroll-fixer"
       style={{ 
         height: '100%',
         display: 'flex',
         flexDirection: 'column',
-        overflow: 'hidden'
       }}
       onScroll={props.onScroll}
     >
