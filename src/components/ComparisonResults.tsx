@@ -184,8 +184,7 @@ const ComparisonResults: React.FC<ComparisonResultsProps> = ({
       bordered={false}
       style={{ 
         borderRadius: '12px', 
-        boxShadow: '0 4px 12px rgba(0, 0, 0, 0.05)',
-        marginTop: '24px'
+        boxShadow: '0 4px 12px rgba(0, 0, 0, 0.05)'
       }}
       extra={
         <Space>
@@ -197,14 +196,6 @@ const ComparisonResults: React.FC<ComparisonResultsProps> = ({
               size="small"
             />
           </Space>
-          {/* <Space align="center" className="view-option">
-            <Text type="secondary">实际模型名称:</Text>
-            <Switch 
-              checked={useRealModelName} 
-              onChange={(checked) => setUseRealModelName(checked)}
-              size="small"
-            />
-          </Space> */}
           <Space align="center" className="view-option">
             <Text type="secondary">代码高亮:</Text>
             <Switch 

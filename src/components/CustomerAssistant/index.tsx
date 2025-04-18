@@ -1,8 +1,20 @@
 import React, { useState, useEffect, useCallback, useRef, memo, forwardRef } from 'react';
 import Chat, { Bubble, useMessages, Card, List, ListItem, SystemMessage } from '@chatui/core';
 import '@chatui/core/dist/index.css';
-import './style.css';
 import { CustomerServiceOutlined, UserOutlined, RocketOutlined, StarOutlined, ClockCircleOutlined } from '@ant-design/icons';
+import OrderCard, { OrderProduct } from './OrderCard';
+
+// 导入拆分后的CSS文件
+import './styles/container.css';
+import './styles/button.css';
+import './styles/chat.css';
+import './styles/messages.css';
+import './styles/system-message.css';
+import './styles/quick-replies.css';
+import './styles/card.css';
+import './styles/product-card.css';
+import './styles/order-card.css';
+import './styles/animations.css';
 
 // 定义常见问题列表
 const commonQuestions = [
@@ -66,28 +78,28 @@ const productCards = [
   }
 ];
 
-// 快速回复选项
+// 定义快速回复选项
 const quickReplies = [
   {
-    icon: 'message',
-    name: '常见问题',
-    code: 'faq',
-  },
-  {
-    icon: 'search',
-    name: '功能搜索',
-    code: 'search',
-  },
-  {
-    icon: 'shop',
-    name: '产品展示',
+    name: '功能介绍',
     code: 'products',
+    icon: 'message'
   },
   {
-    icon: 'help',
-    name: '联系人工客服',
-    code: 'human',
+    name: '使用指南',
+    code: 'guide',
+    icon: 'message'
   },
+  {
+    name: '查询订单',
+    code: 'orders',
+    icon: 'message'
+  },
+  {
+    name: '联系我们',
+    code: 'contact',
+    icon: 'message'
+  }
 ];
 
 // 模拟API请求延迟
@@ -361,6 +373,66 @@ const CustomerAssistant: React.FC<CustomerAssistantProps> = memo(({ isOpen, onCl
         return;
       }
       
+      // 订单查询关键词检测
+      if (val.toLowerCase().includes('订单') || val.toLowerCase().includes('物流') || 
+          val.toLowerCase().includes('购买历史') || val.toLowerCase().includes('我买的')) {
+        setTimeout(() => {
+          appendMsg({
+            type: 'text',
+            content: { 
+              text: '您好，以下是您近期的订单信息:',
+              time: formatTime()
+            },
+            user: { avatar: ASSISTANT_AVATAR },
+          });
+          
+          // 发送订单卡片
+          setTimeout(() => {
+            // 示例订单数据
+            const exampleOrder = {
+              id: 'ORD' + Math.floor(Math.random() * 10000000).toString().padStart(8, '0'),
+              status: 'shipped',
+              createTime: new Date().toLocaleString('zh-CN', { 
+                year: 'numeric', 
+                month: '2-digit', 
+                day: '2-digit',
+                hour: '2-digit',
+                minute: '2-digit'
+              }),
+              products: [
+                {
+                  id: 'PROD001',
+                  name: 'AI评测高级套餐',
+                  price: 299.00,
+                  quantity: 1,
+                  specs: '企业版/1年'
+                },
+                {
+                  id: 'PROD002',
+                  name: '模型评测加速包',
+                  price: 99.00,
+                  quantity: 2,
+                  specs: '10次评测/包'
+                }
+              ],
+              totalAmount: 497.00
+            };
+            
+            appendMsg({
+              type: 'order-card',
+              content: {
+                order: exampleOrder,
+                time: formatTime()
+              },
+              user: { avatar: ASSISTANT_AVATAR },
+            });
+            
+            setIsTyping(false);
+          }, 600);
+        }, 800);
+        return;
+      }
+      
       // 根据消息长度计算模拟延迟时间，让回复更自然
       const delayTime = Math.min(1500, 500 + val.length * 30);
       
@@ -421,6 +493,75 @@ const CustomerAssistant: React.FC<CustomerAssistantProps> = memo(({ isOpen, onCl
           setIsTyping(false);
         }, 400);
       }, 800);
+    } else if (reply.code === 'orders') {
+      // 添加用户消息
+      appendMsg({
+        type: 'text',
+        content: { 
+          text: '查询我的订单',
+          time: formatTime() 
+        },
+        position: 'right',
+        user: { avatar: USER_AVATAR },
+      });
+      
+      // 模拟回复中状态
+      setIsTyping(true);
+      
+      setTimeout(() => {
+        appendMsg({
+          type: 'text',
+          content: { 
+            text: '您好，以下是您近期的订单信息:',
+            time: formatTime() 
+          },
+          user: { avatar: ASSISTANT_AVATAR },
+        });
+        
+        // 发送订单卡片前的短暂延迟
+        setTimeout(() => {
+          // 示例订单数据
+          const exampleOrder = {
+            id: 'ORD' + Math.floor(Math.random() * 10000000).toString().padStart(8, '0'),
+            status: 'shipped',
+            createTime: new Date().toLocaleString('zh-CN', { 
+              year: 'numeric', 
+              month: '2-digit', 
+              day: '2-digit',
+              hour: '2-digit',
+              minute: '2-digit'
+            }),
+            products: [
+              {
+                id: 'PROD001',
+                name: 'AI评测高级套餐',
+                price: 299.00,
+                quantity: 1,
+                specs: '企业版/1年'
+              },
+              {
+                id: 'PROD002',
+                name: '模型评测加速包',
+                price: 99.00,
+                quantity: 2,
+                specs: '10次评测/包'
+              }
+            ],
+            totalAmount: 497.00
+          };
+          
+          appendMsg({
+            type: 'order-card',
+            content: {
+              order: exampleOrder,
+              time: formatTime()
+            },
+            user: { avatar: ASSISTANT_AVATAR },
+          });
+          
+          setIsTyping(false);
+        }, 600);
+      }, 800);
     } else {
       handleSend('text', reply.name);
     }
@@ -460,43 +601,45 @@ const CustomerAssistant: React.FC<CustomerAssistantProps> = memo(({ isOpen, onCl
 
   // 处理产品卡片操作点击
   const handleProductAction = useCallback((productId: string, action: string) => {
-    // 模拟用户点击产品操作
+    console.log('Product action clicked:', productId, action);
+    
+    // 在实际应用中可以根据不同产品和操作执行不同的逻辑
     appendMsg({
       type: 'text',
       content: { 
-        text: `我想${action.includes('use') ? '使用' : '了解'}${productCards.find(p => p.id === productId)?.title}`,
+        text: `您选择了${action}，稍后将会有专业顾问联系您。`,
         time: formatTime() 
       },
-      position: 'right',
-      user: { avatar: USER_AVATAR },
+      user: { avatar: ASSISTANT_AVATAR },
     });
+  }, [appendMsg]);
 
-    // 模拟回复中状态
-    setIsTyping(true);
+  // 处理查看订单详情
+  const handleOrderDetail = useCallback((orderId: string) => {
+    console.log('查看订单详情:', orderId);
     
-    // 模拟延迟回复
-    setTimeout(() => {
-      let response = '';
-      
-      if (action.includes('use')) {
-        response = `好的，请点击页面顶部导航栏的"${productCards.find(p => p.id === productId)?.title}"按钮，即可开始使用该功能。`;
-      } else if (action.includes('learn')) {
-        response = `${productCards.find(p => p.id === productId)?.title}是我们的核心功能之一，它可以${productCards.find(p => p.id === productId)?.description}。您可以通过页面顶部导航栏进入该功能页面体验。`;
-      } else if (action.includes('demo')) {
-        response = `好的，您可以在我们的官方文档中查看${productCards.find(p => p.id === productId)?.title}的演示视频和示例。`;
-      }
-      
-      appendMsg({
-        type: 'text',
-        content: { 
-          text: response,
-          time: formatTime() 
-        },
-        position: 'left',
-        user: { avatar: ASSISTANT_AVATAR },
-      });
-      setIsTyping(false);
-    }, 1200);
+    appendMsg({
+      type: 'text',
+      content: { 
+        text: `您正在查看订单 #${orderId.slice(-8)} 的详细信息，这里是订单的完整明细...`,
+        time: formatTime() 
+      },
+      user: { avatar: ASSISTANT_AVATAR },
+    });
+  }, [appendMsg]);
+  
+  // 处理订单物流跟踪
+  const handleOrderTrack = useCallback((orderId: string) => {
+    console.log('跟踪订单物流:', orderId);
+    
+    appendMsg({
+      type: 'text',
+      content: { 
+        text: `订单 #${orderId.slice(-8)} 物流信息：\n已从杭州发出，预计3-5个工作日送达。`,
+        time: formatTime() 
+      },
+      user: { avatar: ASSISTANT_AVATAR },
+    });
   }, [appendMsg]);
 
   // 自定义渲染消息内容
@@ -508,11 +651,6 @@ const CustomerAssistant: React.FC<CustomerAssistantProps> = memo(({ isOpen, onCl
       return (
         <div className="message-wrapper">
           <Bubble content={content.text} />
-          {content.time && (
-            <div className={`message-time ${msg.position === 'right' ? 'Message--right' : 'Message--left'}`}>
-              <ClockCircleOutlined /> {content.time}
-            </div>
-          )}
         </div>
       );
     }
@@ -541,11 +679,24 @@ const CustomerAssistant: React.FC<CustomerAssistantProps> = memo(({ isOpen, onCl
               </List>
             </div>
           </Card>
-          {content.time && (
-            <div className="message-time Message--left">
-              <ClockCircleOutlined /> {content.time}
-            </div>
-          )}
+        </div>
+      );
+    }
+    
+    // 处理订单卡片消息
+    if (type === 'order-card') {
+      const { order } = content;
+      return (
+        <div className="order-card-wrapper">
+          <OrderCard
+            orderId={order.id}
+            status={order.status}
+            createTime={order.createTime}
+            products={order.products}
+            totalAmount={order.totalAmount}
+            onViewDetail={(orderId) => handleOrderDetail(orderId)}
+            onTrack={(orderId) => handleOrderTrack(orderId)}
+          />
         </div>
       );
     }
@@ -583,17 +734,12 @@ const CustomerAssistant: React.FC<CustomerAssistantProps> = memo(({ isOpen, onCl
               </div>
             ))}
           </div>
-          {content.time && (
-            <div className="message-time Message--left">
-              <ClockCircleOutlined /> {content.time}
-            </div>
-          )}
         </div>
       );
     }
     
     return null;
-  }, [handleCardClick, handleProductAction]);
+  }, [handleCardClick, handleProductAction, handleOrderDetail, handleOrderTrack]);
   
   // 处理消息容器的引用获取
   const handleChatRef = useCallback((node: any) => {

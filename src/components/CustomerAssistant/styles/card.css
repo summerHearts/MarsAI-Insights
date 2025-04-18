@@ -1,0 +1,81 @@
+/* 卡片样式 */
+.customer-assistant-container .Card {
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  margin-bottom: 16px;
+  width: 95%;
+  margin-left: 8px;
+  border: 1px solid #f0f0f0;
+  transition: transform 0.3s, box-shadow 0.3s;
+}
+
+.customer-assistant-container .Card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.1);
+}
+
+.customer-assistant-container .custom-card-content {
+  padding: 8px 16px;
+}
+
+.customer-assistant-container .custom-card-content h4 {
+  margin: 8px 0 12px;
+  font-size: 16px;
+  font-weight: 500;
+  color: #333;
+}
+
+.customer-assistant-container .CardText h4 {
+  margin-top: 0;
+  color: #2563eb;
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.customer-assistant-container .List {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.customer-assistant-container .ListItem {
+  padding: 10px 14px;
+  border-bottom: 1px solid #f0f0f0;
+  font-size: 15px;
+  transition: background-color 0.2s, color 0.2s;
+}
+
+.customer-assistant-container .ListItem:last-child {
+  border-bottom: none;
+}
+
+.customer-assistant-container .ListItem:hover {
+  background-color: #f0f7ff;
+  color: #2563eb;
+  cursor: pointer;
+}
+
+/* 常见问题卡片样式 */
+.card-wrapper {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 12px;
+}
+
+.customer-assistant-container .List-item {
+  padding: 10px 8px;
+  border-radius: 8px;
+  margin-bottom: 4px;
+  transition: all 0.2s;
+  cursor: pointer;
+  font-size: 14px;
+  background-color: #f5f7fa;
+  border-left: 3px solid #e8e8e8;
+}
+
+.customer-assistant-container .List-item:hover {
+  background-color: #eef2f8;
+  border-left-color: #1677ff;
+  transform: translateX(2px);
+} 
