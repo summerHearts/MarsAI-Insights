@@ -18,8 +18,7 @@
   overflow: hidden;
   margin: 10px 8px;
   border: 1px solid #ebedf0;
-  width: 85%;
-  max-width: 320px;
+  width: 95%;
   animation: order-card-in 0.5s cubic-bezier(0.23, 1, 0.32, 1) forwards;
 }
 
