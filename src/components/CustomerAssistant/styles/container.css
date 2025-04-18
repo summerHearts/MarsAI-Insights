@@ -56,4 +56,45 @@ body, html {
     right: 0;
     border-radius: 0;
   }
+  
+  /* 移动设备上优化导航栏和底部区域 */
+  .customer-assistant-container .ChatApp-header {
+    height: 50px;
+    padding: 0 12px;
+  }
+  
+  .customer-assistant-container .Composer {
+    padding: 8px;
+  }
+  
+  /* 确保底部输入区和按钮在小屏幕上更易用 */
+  .customer-assistant-container .Composer-input {
+    font-size: 16px; /* 避免iOS上放大输入框 */
+    padding: 8px 12px;
+  }
+  
+  /* 确保横向滚动区域正常工作 */
+  .customer-assistant-container .QuickReplies {
+    padding: 8px;
+  }
+  
+  /* 针对更小屏幕的布局优化 */
+  .customer-assistant-container .Message {
+    margin-bottom: 16px;
+  }
+  
+  .customer-assistant-container .Bubble {
+    max-width: 90%;
+    padding: 10px 14px;
+  }
+  
+  /* 确保所有可能的水平滚动区域在移动设备上可滚动 */
+  .customer-assistant-container [class*="-list"],
+  .customer-assistant-container [class*="-menu"],
+  .customer-assistant-container [class*="-items"],
+  .customer-assistant-container [class*="-wrapper"] {
+    overflow-x: auto !important;
+    -webkit-overflow-scrolling: touch !important;
+    scrollbar-width: none;
+  }
 } 

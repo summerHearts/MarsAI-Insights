@@ -123,4 +123,67 @@
 .customer-assistant-container .Composer-sendButton:active {
   transform: translateY(0);
   box-shadow: 0 1px 3px rgba(22, 119, 255, 0.2);
+}
+
+/* 确保所有横向滚动区域在移动设备上正常工作 */
+.customer-assistant-container .scrollable-x {
+  overflow-x: auto !important;
+  -webkit-overflow-scrolling: touch !important;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.customer-assistant-container .scrollable-x::-webkit-scrollbar {
+  display: none;
+}
+
+/* 确保ChatUI原生组件中的横向滚动列表也能正常工作 */
+.customer-assistant-container [class*="Scroller"] {
+  overflow-x: auto !important;
+  -webkit-overflow-scrolling: touch !important;
+  scroll-behavior: smooth;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.customer-assistant-container [class*="Scroller"]::-webkit-scrollbar {
+  display: none;
+}
+
+/* 修复功能介绍栏的横向滚动 */
+.customer-assistant-container .Navbar-menu {
+  overflow-x: auto !important;
+  -webkit-overflow-scrolling: touch !important;
+  white-space: nowrap;
+  scroll-behavior: smooth;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.customer-assistant-container .Navbar-menu::-webkit-scrollbar {
+  display: none;
+}
+
+.customer-assistant-container .Navbar-item {
+  display: inline-block;
+  flex-shrink: 0;
+}
+
+/* 修复标签页和其他菜单的横向滚动 */
+.customer-assistant-container .Tabs-wrap,
+.customer-assistant-container .TabPanel-wrap,
+.customer-assistant-container .Carousel-wrap,
+.customer-assistant-container .HorizontalList {
+  overflow-x: auto !important;
+  -webkit-overflow-scrolling: touch !important;
+  scroll-behavior: smooth;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.customer-assistant-container .Tabs-wrap::-webkit-scrollbar,
+.customer-assistant-container .TabPanel-wrap::-webkit-scrollbar,
+.customer-assistant-container .Carousel-wrap::-webkit-scrollbar,
+.customer-assistant-container .HorizontalList::-webkit-scrollbar {
+  display: none;
 } 
