@@ -3,12 +3,25 @@
   background-color: #fafbfc;
   border-top: 1px solid #eaeaea;
   padding: 12px 16px;
+  overflow: hidden; /* 防止溢出 */
 }
 
 .customer-assistant-container .QuickReplies-list {
   display: flex;
   flex-wrap: nowrap;
   padding: 0 4px;
+  overflow-x: auto; /* 添加横向滚动 */
+  -webkit-overflow-scrolling: touch; /* 增强iOS滚动体验 */
+  scrollbar-width: none; /* 隐藏Firefox滚动条 */
+  -ms-overflow-style: none; /* 隐藏IE滚动条 */
+  scroll-behavior: smooth; /* 平滑滚动效果 */
+  padding-bottom: 10px; /* 为滚动条留出空间 */
+  margin-bottom: -10px; /* 抵消多余空间 */
+}
+
+/* 隐藏Webkit滚动条但保留功能 */
+.customer-assistant-container .QuickReplies-list::-webkit-scrollbar {
+  display: none;
 }
 
 .customer-assistant-container .QuickReply {
@@ -19,6 +32,8 @@
   margin-right: 8px;
   margin-bottom: 8px;
   transition: all 0.2s;
+  white-space: nowrap; /* 防止文字换行 */
+  flex-shrink: 0; /* 防止项目被压缩 */
 }
 
 .customer-assistant-container .QuickReply:hover {

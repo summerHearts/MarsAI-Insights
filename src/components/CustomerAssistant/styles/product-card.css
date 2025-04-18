@@ -75,6 +75,7 @@
 .product-card-actions {
   display: flex;
   gap: 8px;
+  flex-wrap: wrap;
 }
 
 .product-card-action-btn {
@@ -86,8 +87,10 @@
   color: #1677ff;
   cursor: pointer;
   transition: all 0.2s;
-  flex: 1;
+  flex: 1 0 auto;
+  min-width: 80px;
   text-align: center;
+  white-space: nowrap;
 }
 
 .product-card-action-btn:hover {
@@ -110,5 +113,13 @@
 @media (max-width: 480px) {
   .product-cards-container {
     max-width: 100%;
+  }
+  
+  .product-card-actions {
+    margin-top: 10px;
+  }
+  
+  .product-card-action-btn {
+    margin-bottom: 6px;
   }
 } 
