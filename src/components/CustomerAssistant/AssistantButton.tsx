@@ -1,6 +1,6 @@
 import React, { memo } from 'react';
 import { CustomerServiceOutlined, CloseOutlined } from '@ant-design/icons';
-import './style.css';
+import './styles/button.css';
 
 interface AssistantButtonProps {
   isOpen: boolean;
@@ -8,7 +8,7 @@ interface AssistantButtonProps {
 }
 
 const AssistantButton: React.FC<AssistantButtonProps> = memo(({ isOpen, onClick }) => {
-  // 阻止事件冒泡
+  // 处理点击事件
   const handleClick = (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();

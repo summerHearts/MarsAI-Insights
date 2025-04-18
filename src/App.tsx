@@ -786,8 +786,8 @@ function App() {
                     </Typography.Title>
                     <Typography.Text type="secondary">比较不同模型的输出结果，分析差异</Typography.Text>
                   </div>
-                  <div className="main-layout">
-                    <div className="form-container">
+                  <div className="main-layout" style={{ flexDirection: 'column' }}>
+                    <div className="form-container" style={{ width: '100%', maxWidth: '100%' }}>
                       <ComparisonForm
                         models={models}
                         isLoading={isLoading}
@@ -808,7 +808,7 @@ function App() {
                         onSpeakerMapChange={setSpeakerMap}
                       />
                     </div>
-                    <div className="results-container">
+                    <div className="results-container" style={{ width: '100%', maxWidth: '100%' }}>
                       <ComparisonResults
                         isLoading={isLoading}
                         responses={responses}

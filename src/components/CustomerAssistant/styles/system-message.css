@@ -1,0 +1,43 @@
+/* 系统消息样式 */
+.customer-assistant-container .MessageContainer > .Message.Message--system {
+  justify-content: center !important;
+  margin: 12px 0 20px;
+}
+
+.customer-assistant-container .SystemMessage {
+  background-color: rgba(0, 0, 0, 0.05);
+  color: #4b5563;
+  font-size: 14px;
+  font-weight: 500;
+  padding: 8px 16px;
+  border-radius: 16px;
+  display: inline-block;
+  max-width: 85%;
+  text-align: center;
+  margin: 0 auto;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
+  animation: system-message-fade-in 0.5s ease;
+}
+
+@keyframes system-message-fade-in {
+  from {
+    opacity: 0;
+    transform: translateY(-5px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* 确保系统消息正确居中 */
+.customer-assistant-container .MessageContainer > .Message.Message--system .Message-content {
+  display: flex;
+  justify-content: center;
+  width: 100%;
+}
+
+.customer-assistant-container .Message.Message--center {
+  opacity: 0.85;
+  margin: 10px 0;
+} 

@@ -1,0 +1,245 @@
+/* 消息容器样式 */
+.customer-assistant-container .Message {
+  padding: 0;
+  margin-bottom: 20px;
+  display: flex;
+  align-items: flex-start;
+  width: 100%;
+  animation: message-fade-in 0.4s ease;
+}
+
+@keyframes message-fade-in {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* 右侧消息样式 - 用户 */
+.customer-assistant-container .Message--right {
+  flex-direction: row-reverse;
+  justify-content: flex-end;
+}
+
+/* 左侧消息样式 - 客服 */
+.customer-assistant-container .Message--left {
+  flex-direction: row;
+  justify-content: flex-start;
+}
+
+/* 头像样式 */
+.customer-assistant-container .Avatar {
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  margin: 0 0px;
+  overflow: hidden;
+  flex-shrink: 0;
+  background-color: #f0f0f0;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+  border: 2px solid white;
+}
+
+.customer-assistant-container .Avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.customer-assistant-container .Message--left .Avatar {
+  background: linear-gradient(135deg, #0ea5e9, #38bdf8);
+}
+
+/* 自定义用户头像样式 */
+.customer-assistant-container .Message--right .Avatar {
+  display: block; /* 显示用户头像 */
+  background: linear-gradient(135deg, #2563eb, #3b82f6);
+}
+
+/* 气泡基本样式 */
+.customer-assistant-container .Bubble {
+  position: relative;
+  display: inline-block;
+  border-radius: 16px;
+  padding: 12px 16px;
+  font-size: 15px;
+  line-height: 1.6;
+  word-break: break-word;
+  white-space: pre-wrap;
+  max-width: 85%;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+  transition: transform 0.2s, box-shadow 0.2s;
+  animation: bubble-pop 0.3s ease forwards;
+  transform-origin: bottom;
+}
+
+.customer-assistant-container .Bubble:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.08);
+}
+
+/* 左侧气泡样式 - 客服 */
+.customer-assistant-container .Bubble--left {
+  border-bottom-left-radius: 4px;
+  background-color: white;
+  border: 1px solid #eaeaea;
+}
+
+/* 右侧气泡样式 - 用户 */
+.customer-assistant-container .Bubble--right {
+  border-bottom-right-radius: 4px;
+  background-color: #1677ff;
+  color: white;
+}
+
+/* 确保消息气泡内容样式 */
+.customer-assistant-container .Bubble-content {
+  display: inline-block;
+  overflow: hidden;
+}
+
+/* 添加嵌套消息结构样式 */
+.customer-assistant-container .Message-main {
+  flex: 1;
+  margin: 0;
+  overflow: hidden;
+}
+
+.customer-assistant-container .Message--right .Message-main {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.customer-assistant-container .Message--left .Message-main {
+  display: flex;
+  justify-content: flex-start;
+}
+
+.customer-assistant-container .Message-inner {
+  display: flex;
+  flex-direction: column;
+  position: relative;
+}
+
+.customer-assistant-container .Message--right .Message-inner {
+  align-items: flex-end;
+}
+
+.customer-assistant-container .Message--left .Message-inner {
+  align-items: flex-start;
+}
+
+.customer-assistant-container .Message-content {
+  position: relative;
+}
+
+/* 修复右侧用户消息的气泡样式 */
+.customer-assistant-container .Message--right .Bubble.text {
+  border-bottom-right-radius: 4px;
+  background: linear-gradient(135deg, #2563eb, #3b82f6);
+  color: white;
+}
+
+/* 确保右侧气泡内容居右 */
+.customer-assistant-container .Message--right .Bubble-content {
+  text-align: right;
+}
+
+/* 气泡动画 */
+@keyframes bubble-pop {
+  from {
+    opacity: 0.5;
+    transform: scale(0.96);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+/* 消息时间戳样式 */
+.message-time {
+  display: none !important; /* 完全隐藏时间控件 */
+}
+
+.message-wrapper {
+  display: flex;
+  flex-direction: column;
+  max-width: 85%;
+}
+
+.Message--right .message-wrapper {
+  align-items: flex-end;
+  width: 100%;
+  display: flex;
+  justify-content: flex-end;
+}
+
+.Message--left .message-wrapper {
+  align-items: flex-start;
+}
+
+.Message--right .message-time {
+  justify-content: flex-end;
+  padding-right: 4px;
+  text-align: right;
+  width: 100%;
+}
+
+.Message--left .message-time {
+  justify-content: flex-start;
+  padding-left: 4px;
+}
+
+.message-time .anticon {
+  font-size: 10px;
+}
+
+@keyframes fade-in {
+  from {
+    opacity: 0;
+    transform: translateY(-5px);
+  }
+  to {
+    opacity: 0.85;
+    transform: translateY(0);
+  }
+}
+
+/* 打字指示器样式 */
+.customer-assistant-container .Typing {
+  padding: 12px;
+  border-radius: 16px;
+  background-color: white;
+  border: 1px solid #eaeaea;
+  border-bottom-left-radius: 4px;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+  max-width: 60px;
+}
+
+.customer-assistant-container .Typing-dot {
+  background-color: #999;
+  width: 7px;
+  height: 7px;
+  animation: typing-dot 1.4s infinite ease-in-out;
+}
+
+.customer-assistant-container .Typing-dot:nth-child(1) { animation-delay: 0s; }
+.customer-assistant-container .Typing-dot:nth-child(2) { animation-delay: 0.2s; }
+.customer-assistant-container .Typing-dot:nth-child(3) { animation-delay: 0.4s; }
+
+@keyframes typing-dot {
+  0%, 60%, 100% {
+    transform: translateY(0);
+    opacity: 0.6;
+  }
+  30% {
+    transform: translateY(-5px);
+    opacity: 1;
+  }
+} 

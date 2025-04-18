@@ -291,7 +291,6 @@ body {
 
 /* 比较结果卡片样式 */
 .results-card {
-  margin-top: 24px;
   transition: all 0.3s;
 }
 
@@ -996,7 +995,7 @@ pre {
 
 .main-layout {
   display: flex;
-  margin: 0 -12px;
+  gap: 24px;
   flex-wrap: wrap;
 }
 
@@ -1004,13 +1003,15 @@ pre {
   flex: 1;
   min-width: 400px;
   padding: 0 12px;
-  margin-bottom: 24px;
+  margin-bottom: 16px;
+  width: 100%;
 }
 
 .results-container {
   flex: 1;
   min-width: 400px;
   padding: 0 12px;
+  width: 100%;
 }
 
 /* 响应式组件头部 */
