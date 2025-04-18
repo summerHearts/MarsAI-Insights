@@ -1,7 +1,23 @@
 import React, { useState, useEffect, useCallback, useRef, memo, forwardRef } from 'react';
 import Chat, { Bubble, useMessages, Card, List, ListItem, SystemMessage } from '@chatui/core';
 import '@chatui/core/dist/index.css';
-import { CustomerServiceOutlined, UserOutlined, RocketOutlined, StarOutlined, ClockCircleOutlined, CloseOutlined } from '@ant-design/icons';
+import { 
+  CustomerServiceOutlined, UserOutlined, RocketOutlined, StarOutlined, 
+  ClockCircleOutlined, CloseOutlined, EnvironmentOutlined, PhoneOutlined, 
+  ShoppingOutlined, CarOutlined, CreditCardOutlined, CalendarOutlined,
+  CheckCircleOutlined, TagOutlined, BarcodeOutlined, DollarOutlined,
+  SyncOutlined, 
+  SettingOutlined,
+  HistoryOutlined,
+  FileTextOutlined,
+  FileExcelOutlined,
+  TableOutlined,
+  AuditOutlined,
+  BarChartOutlined,
+  SendOutlined,
+  CameraOutlined,
+  QuestionCircleOutlined
+} from '@ant-design/icons';
 import OrderCard, { OrderProduct } from './OrderCard';
 import { ImageMessage, ImageWithText } from './ImageMessage';
 
@@ -745,12 +761,51 @@ const CustomerAssistant: React.FC<CustomerAssistantProps> = memo(({ isOpen, onCl
   // 处理查看订单详情
   const handleOrderDetail = useCallback((orderId: string) => {
     console.log('查看订单详情:', orderId);
-    
+
+    // 模拟更详细的订单信息
+    const mockDetails = {
+      id: orderId,
+      status: 'shipped',
+      orderDate: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000).toLocaleDateString('zh-CN'),
+      shippingAddress: '上海市 浦东新区 张江路 123号',
+      receiverName: '张先生', 
+      receiverPhone: '138****1234',
+      items: [
+        { 
+          name: 'AI评测高级套餐', 
+          qty: 1, 
+          price: 299.00, 
+          specs: '企业版/1年'
+        },
+        { 
+          name: '模型评测加速包', 
+          qty: 2, 
+          price: 99.00, 
+          specs: '10次评测/包'
+        },
+      ],
+      shippingMethod: '顺丰速运',
+      trackingNumber: 'SF' + Math.floor(Math.random() * 10000000000).toString().padStart(10, '0'),
+      estimatedDelivery: new Date(Date.now() + 2 * 24 * 60 * 60 * 1000).toLocaleDateString('zh-CN'),
+      paymentMethod: '微信支付',
+      paymentTime: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000 + 1800000).toLocaleString('zh-CN', { 
+        month: '2-digit', 
+        day: '2-digit',
+        hour: '2-digit',
+        minute: '2-digit'
+      }),
+      subtotal: 497.00,
+      shippingFee: 0.00,
+      discount: 0.00,
+      total: 497.00,
+    };
+
+    // 发送包含结构化订单详情的新类型消息
     appendMsg({
-      type: 'text',
-      content: { 
-        text: `您正在查看订单 #${orderId.slice(-8)} 的详细信息，这里是订单的完整明细...`,
-        time: formatTime() 
+      type: 'detailed-order-card',
+      content: {
+        details: mockDetails,
+        time: formatTime()
       },
       user: { avatar: ASSISTANT_AVATAR },
     });
@@ -763,7 +818,7 @@ const CustomerAssistant: React.FC<CustomerAssistantProps> = memo(({ isOpen, onCl
     appendMsg({
       type: 'text',
       content: { 
-        text: `订单 #${orderId.slice(-8)} 物流信息：\n已从杭州发出，预计3-5个工作日送达。`,
+        text: `订单 ${orderId.slice(-8)} 物流信息：\n已从杭州发出，预计3-5个工作日送达。`,
         time: formatTime() 
       },
       user: { avatar: ASSISTANT_AVATAR },
@@ -901,6 +956,177 @@ const CustomerAssistant: React.FC<CustomerAssistantProps> = memo(({ isOpen, onCl
               </div>
             ))}
           </div>
+        </div>
+      );
+    }
+    
+    // 添加对 'detailed-order-card' 类型的处理
+    if (type === 'detailed-order-card') {
+      const { details } = content;
+      
+      // 状态映射
+      const statusConfig = {
+        'shipped': { text: '已发货', color: '#1890ff', icon: <CarOutlined /> },
+        'delivered': { text: '已送达', color: '#52c41a', icon: <CheckCircleOutlined /> },
+        'pending': { text: '待发货', color: '#faad14', icon: <ClockCircleOutlined /> },
+        'canceled': { text: '已取消', color: '#ff4d4f', icon: <CloseOutlined /> }
+      };
+      
+      // 获取当前状态配置，默认使用已发货
+      const currentStatus = statusConfig[details.status as keyof typeof statusConfig] || statusConfig.shipped;
+      
+      return (
+        <div className="message-wrapper detailed-order-card-wrapper">
+          <Card className="detailed-order-card" size="sm" fluid>
+            {/* 卡片顶部：订单号和状态 */}
+            <div className="detailed-order-header">
+              <div className="detailed-order-id">
+                <BarcodeOutlined className="order-icon" />
+                <span>订单号: #{details.id.slice(-8)}</span>
+              </div>
+              <div className="detailed-order-status" style={{ backgroundColor: `${currentStatus.color}15`, color: currentStatus.color }}>
+                {currentStatus.icon}
+                <span>{currentStatus.text}</span>
+              </div>
+            </div>
+            
+            <div className="detailed-order-content">
+              {/* 订单概览 */}
+              <div className="detailed-order-section">
+                <div className="section-title">
+                  <CalendarOutlined className="section-icon" />
+                  <span>订单信息</span>
+                </div>
+                <div className="info-grid">
+                  <div className="info-item">
+                    <span className="info-label">下单时间:</span>
+                    <span className="info-value">{details.orderDate}</span>
+                  </div>
+                  <div className="info-item">
+                    <span className="info-label">支付方式:</span>
+                    <span className="info-value">{details.paymentMethod}</span>
+                  </div>
+                  {details.paymentTime && (
+                    <div className="info-item">
+                      <span className="info-label">支付时间:</span>
+                      <span className="info-value">{details.paymentTime}</span>
+                    </div>
+                  )}
+                </div>
+              </div>
+              
+              {/* 收货信息 */}
+              <div className="detailed-order-section">
+                <div className="section-title">
+                  <EnvironmentOutlined className="section-icon" />
+                  <span>收货信息</span>
+                </div>
+                <div className="delivery-info">
+                  {details.receiverName && (
+                    <div className="info-item">
+                      <span className="info-label">收货人:</span>
+                      <span className="info-value">{details.receiverName}</span>
+                    </div>
+                  )}
+                  {details.receiverPhone && (
+                    <div className="info-item">
+                      <span className="info-label">联系方式:</span>
+                      <span className="info-value">{details.receiverPhone}</span>
+                    </div>
+                  )}
+                  <div className="info-item full-width">
+                    <span className="info-label">收货地址:</span>
+                    <span className="info-value">{details.shippingAddress}</span>
+                  </div>
+                  <div className="info-grid">
+                    <div className="info-item">
+                      <span className="info-label">配送方式:</span>
+                      <span className="info-value">{details.shippingMethod}</span>
+                    </div>
+                    {details.trackingNumber && (
+                      <div className="info-item full-width">
+                        <span className="info-label">物流单号:</span>
+                        <span className="info-value">{details.trackingNumber}</span>
+                      </div>
+                    )}
+                    <div className="info-item">
+                      <span className="info-label">预计送达:</span>
+                      <span className="info-value highlight">{details.estimatedDelivery}</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              
+              {/* 商品列表 */}
+              <div className="detailed-order-section">
+                <div className="section-title">
+                  <ShoppingOutlined className="section-icon" />
+                  <span>商品清单</span>
+                </div>
+                <div className="product-list">
+                  {details.items.map((item: any, index: number) => (
+                    <div key={index} className="product-item">
+                      <div className="product-image-placeholder">
+                        <TagOutlined />
+                      </div>
+                      <div className="product-info">
+                        <div className="product-name">{item.name}</div>
+                        <div className="product-meta">
+                          {item.specs && <span className="product-spec">{item.specs}</span>}
+                          <span className="product-qty">x{item.qty}</span>
+                        </div>
+                      </div>
+                      <div className="product-price">¥{item.price.toFixed(2)}</div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+              
+              {/* 金额信息 */}
+              <div className="detailed-order-section payment-section">
+                <div className="section-title">
+                  <DollarOutlined className="section-icon" />
+                  <span>支付详情</span>
+                </div>
+                <div className="payment-details">
+                  <div className="payment-row">
+                    <span>商品金额:</span>
+                    <span>¥{details.subtotal.toFixed(2)}</span>
+                  </div>
+                  <div className="payment-row">
+                    <span>运费:</span>
+                    <span>¥{details.shippingFee.toFixed(2)}</span>
+                  </div>
+                  {details.discount > 0 && (
+                    <div className="payment-row discount">
+                      <span>优惠:</span>
+                      <span>-¥{details.discount.toFixed(2)}</span>
+                    </div>
+                  )}
+                  <div className="payment-row total">
+                    <span>合计:</span>
+                    <span>¥{details.total.toFixed(2)}</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+            
+            {/* 订单底部区域 */}
+            <div className="detailed-order-footer">
+              <div className="order-tip">如有疑问，请联系客服</div>
+              <div className="order-actions">
+                <button className="order-action-btn" onClick={() => {
+                  navigator.clipboard.writeText(details.id);
+                  // 在实际应用中，您可能希望添加一个复制成功的提示
+                }}>复制订单号</button>
+                {details.status === 'shipped' && (
+                  <button className="order-action-btn primary" onClick={() => handleOrderTrack && handleOrderTrack(details.id)}>
+                    查看物流
+                  </button>
+                )}
+              </div>
+            </div>
+          </Card>
         </div>
       );
     }
