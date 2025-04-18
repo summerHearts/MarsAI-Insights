@@ -738,40 +738,6 @@ function App() {
                 </Menu.Item>
               </Menu>
             )}
-            
-            <Space className="header-actions">
-              {!isMobile && (
-                <Tooltip title="使用帮助">
-                  <Button type="text" icon={<CodeOutlined />} style={{ color: 'white' }} />
-                </Tooltip>
-              )}
-              <Dropdown menu={{ 
-                items: [
-                  {
-                    key: '1',
-                    label: '主题设置',
-                    icon: <SettingOutlined />
-                  },
-                  {
-                    key: '2',
-                    label: '导出数据',
-                    icon: <DatabaseOutlined />
-                  },
-                  {
-                    key: '3',
-                    label: '关于',
-                    icon: <TeamOutlined />
-                  },
-                  ...(isMobile ? [{
-                    key: '4',
-                    label: '使用帮助',
-                    icon: <CodeOutlined />
-                  }] : [])
-                ] 
-              }}>
-                <Avatar style={{ backgroundColor: 'rgba(255,255,255,0.2)', cursor: 'pointer' }} icon={<ToolOutlined />} />
-              </Dropdown>
-            </Space>
           </div>
         </Header>
         

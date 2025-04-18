@@ -165,11 +165,11 @@ const ScrollFixer = forwardRef((props: {children: React.ReactNode, onScroll?: (e
   return (
     <div 
       ref={innerRef} 
+      className="scroll-fixer"
       style={{ 
         height: '100%',
         display: 'flex',
         flexDirection: 'column',
-        overflow: 'hidden'
       }}
       onScroll={props.onScroll}
     >
@@ -946,6 +946,7 @@ const CustomerAssistant: React.FC<CustomerAssistantProps> = memo(({ isOpen, onCl
               icon: 'chevron-left',
               onClick: handleCloseChat,
             },
+            rightContent: [], // 设置为空数组，移除帮助和设置按钮
           }}
           messages={messages}
           renderMessageContent={renderMessageContent}

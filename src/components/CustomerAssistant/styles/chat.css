@@ -127,8 +127,8 @@
 
 /* 确保所有横向滚动区域在移动设备上正常工作 */
 .customer-assistant-container .scrollable-x {
-  overflow-x: auto !important;
-  -webkit-overflow-scrolling: touch !important;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
   scrollbar-width: none;
   -ms-overflow-style: none;
 }
@@ -138,22 +138,22 @@
 }
 
 /* 确保ChatUI原生组件中的横向滚动列表也能正常工作 */
-.customer-assistant-container [class*="Scroller"] {
-  overflow-x: auto !important;
-  -webkit-overflow-scrolling: touch !important;
+.customer-assistant-container .ScrollView-scroller {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
   scroll-behavior: smooth;
   scrollbar-width: none;
   -ms-overflow-style: none;
 }
 
-.customer-assistant-container [class*="Scroller"]::-webkit-scrollbar {
+.customer-assistant-container .ScrollView-scroller::-webkit-scrollbar {
   display: none;
 }
 
 /* 修复功能介绍栏的横向滚动 */
 .customer-assistant-container .Navbar-menu {
-  overflow-x: auto !important;
-  -webkit-overflow-scrolling: touch !important;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
   white-space: nowrap;
   scroll-behavior: smooth;
   scrollbar-width: none;
@@ -174,8 +174,8 @@
 .customer-assistant-container .TabPanel-wrap,
 .customer-assistant-container .Carousel-wrap,
 .customer-assistant-container .HorizontalList {
-  overflow-x: auto !important;
-  -webkit-overflow-scrolling: touch !important;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
   scroll-behavior: smooth;
   scrollbar-width: none;
   -ms-overflow-style: none;
@@ -186,4 +186,18 @@
 .customer-assistant-container .Carousel-wrap::-webkit-scrollbar,
 .customer-assistant-container .HorizontalList::-webkit-scrollbar {
   display: none;
+}
+
+/* 隐藏导航栏右侧的帮助和设置按钮 */
+.customer-assistant-container .Navbar-right button,
+.customer-assistant-container .Navbar-right .IconBtn {
+  display: none !important;
+}
+
+/* 确保右侧空间不占用 */
+.customer-assistant-container .Navbar-right {
+  width: 0;
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
 } 

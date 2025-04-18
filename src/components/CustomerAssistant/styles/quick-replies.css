@@ -10,13 +10,17 @@
   display: flex;
   flex-wrap: nowrap;
   padding: 0 4px;
-  overflow-x: auto; /* 添加横向滚动 */
+  overflow-x: auto; /* 允许横向滚动 */
+  overflow-y: hidden; /* 禁止纵向滚动 */
   -webkit-overflow-scrolling: touch; /* 增强iOS滚动体验 */
   scrollbar-width: none; /* 隐藏Firefox滚动条 */
   -ms-overflow-style: none; /* 隐藏IE滚动条 */
   scroll-behavior: smooth; /* 平滑滚动效果 */
   padding-bottom: 10px; /* 为滚动条留出空间 */
   margin-bottom: -10px; /* 抵消多余空间 */
+  touch-action: pan-x; /* 优先处理横向滑动 */
+  position: relative; /* 添加相对定位以确保z-index生效 */
+  z-index: 1; /* 确保在内容层之上 */
 }
 
 /* 隐藏Webkit滚动条但保留功能 */
