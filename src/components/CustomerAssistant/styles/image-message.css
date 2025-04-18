@@ -1,0 +1,98 @@
+/* 图片消息样式 */
+.customer-assistant-container .image-message {
+  max-width: 100%;
+  border-radius: 8px;
+  overflow: hidden;
+  margin-bottom: 8px;
+}
+
+.customer-assistant-container .image-message-content {
+  display: flex;
+  flex-direction: column;
+}
+
+.customer-assistant-container .image-message-img {
+  max-width: 240px;
+  max-height: 200px;
+  border-radius: 8px;
+  object-fit: cover;
+  margin-bottom: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s ease;
+  cursor: pointer;
+}
+
+.customer-assistant-container .image-message-img:hover {
+  transform: scale(1.02);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.customer-assistant-container .image-message-caption {
+  font-size: 14px;
+  color: #333;
+  margin-top: 6px;
+  line-height: 1.5;
+}
+
+/* 图文混排布局 */
+.customer-assistant-container .image-with-text {
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+  max-width: 100%;
+  margin-bottom: 8px;
+}
+
+.customer-assistant-container .image-with-text-left {
+  flex-direction: row;
+}
+
+.customer-assistant-container .image-with-text-right {
+  flex-direction: row-reverse;
+}
+
+.customer-assistant-container .image-with-text-top {
+  flex-direction: column;
+}
+
+.customer-assistant-container .image-with-text-bottom {
+  flex-direction: column-reverse;
+}
+
+.customer-assistant-container .image-with-text-img {
+  width: 120px;
+  height: 90px;
+  object-fit: cover;
+  border-radius: 8px;
+  flex-shrink: 0;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+  transition: all 0.3s ease;
+  cursor: pointer;
+}
+
+.customer-assistant-container .image-with-text-img:hover {
+  transform: scale(1.05);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+}
+
+.customer-assistant-container .image-with-text-content {
+  flex: 1;
+  font-size: 14px;
+  line-height: 1.5;
+  color: #333;
+  overflow-wrap: break-word;
+  word-break: break-word;
+}
+
+/* 响应式调整 */
+@media (max-width: 480px) {
+  .customer-assistant-container .image-with-text {
+    flex-direction: column;
+  }
+  
+  .customer-assistant-container .image-with-text-img {
+    width: 100%;
+    height: auto;
+    max-height: 160px;
+  }
+} 
