@@ -1,8 +1,9 @@
 import React, { useState, useEffect, useCallback, useRef, memo, forwardRef } from 'react';
 import Chat, { Bubble, useMessages, Card, List, ListItem, SystemMessage } from '@chatui/core';
 import '@chatui/core/dist/index.css';
-import { CustomerServiceOutlined, UserOutlined, RocketOutlined, StarOutlined, ClockCircleOutlined } from '@ant-design/icons';
+import { CustomerServiceOutlined, UserOutlined, RocketOutlined, StarOutlined, ClockCircleOutlined, CloseOutlined } from '@ant-design/icons';
 import OrderCard, { OrderProduct } from './OrderCard';
+import { ImageMessage, ImageWithText } from './ImageMessage';
 
 // 导入拆分后的CSS文件
 import './styles/container.css';
@@ -15,6 +16,8 @@ import './styles/card.css';
 import './styles/product-card.css';
 import './styles/order-card.css';
 import './styles/animations.css';
+import './styles/image-message.css';
+import './styles/image-preview.css';
 
 // 定义常见问题列表
 const commonQuestions = [
@@ -94,6 +97,11 @@ const quickReplies = [
     name: '查询订单',
     code: 'orders',
     icon: 'message'
+  },
+  {
+    name: '评测演示',
+    code: 'demo',
+    icon: 'picture'
   },
   {
     name: '联系我们',
@@ -177,6 +185,9 @@ const CustomerAssistant: React.FC<CustomerAssistantProps> = memo(({ isOpen, onCl
   const [initialized, setInitialized] = useState(false);
   const chatContainerRef = useRef<HTMLDivElement>(null);
   const messageContainerRef = useRef<HTMLDivElement>(null);
+  
+  // 图片预览状态
+  const [previewImage, setPreviewImage] = useState<string | null>(null);
   
   // 优化滚动事件处理 - 彻底阻止事件穿透
   useEffect(() => {
@@ -330,19 +341,53 @@ const CustomerAssistant: React.FC<CustomerAssistantProps> = memo(({ isOpen, onCl
   // 处理发送消息
   const handleSend = useCallback((type: string, val: string) => {
     if (type === 'text' && val.trim()) {
-      // 添加用户消息，确保设置position为right
+      // 添加用户消息
       appendMsg({
         type: 'text',
         content: { 
           text: val,
           time: formatTime() 
         },
-        position: 'right', // 明确指定位置为右侧
+        position: 'right',
         user: { avatar: USER_AVATAR },
       });
 
       // 模拟回复中状态
       setIsTyping(true);
+      
+      // 处理图片相关关键词
+      if (val.toLowerCase().includes('图片') || val.toLowerCase().includes('截图') || val.toLowerCase().includes('照片')) {
+        setTimeout(() => {
+          // 发送图片消息
+          appendMsg({
+            type: 'image',
+            content: {
+              src: 'https://ai-sample.oss-cn-hangzhou.aliyuncs.com/model_comparison.png',
+              alt: '模型比较示例',
+              caption: '模型评测对比结果示例',
+              time: formatTime()
+            },
+            user: { avatar: ASSISTANT_AVATAR },
+          });
+          
+          // 延迟发送图文混排消息
+          setTimeout(() => {
+            appendMsg({
+              type: 'image-with-text',
+              content: {
+                src: 'https://ai-sample.oss-cn-hangzhou.aliyuncs.com/llm_benchmark.png',
+                text: '上图展示了我们平台支持的主流大语言模型性能对比基准测试结果。您可以在我们的平台上轻松进行类似的模型评测和数据分析。',
+                layout: 'top',
+                time: formatTime()
+              },
+              user: { avatar: ASSISTANT_AVATAR },
+            });
+            
+            setIsTyping(false);
+          }, 800);
+        }, 1000);
+        return;
+      }
       
       // 处理特殊指令
       if (val.toLowerCase().includes('产品') || val.toLowerCase().includes('功能')) {
@@ -562,6 +607,89 @@ const CustomerAssistant: React.FC<CustomerAssistantProps> = memo(({ isOpen, onCl
           setIsTyping(false);
         }, 600);
       }, 800);
+    } else if (reply.code === 'demo') {
+      // 添加用户消息
+      appendMsg({
+        type: 'text',
+        content: { 
+          text: '查看评测演示',
+          time: formatTime() 
+        },
+        position: 'right',
+        user: { avatar: USER_AVATAR },
+      });
+      
+      // 模拟回复中状态
+      setIsTyping(true);
+      
+      setTimeout(() => {
+        appendMsg({
+          type: 'text',
+          content: { 
+            text: '以下是我们平台的评测演示示例:',
+            time: formatTime() 
+          },
+          user: { avatar: ASSISTANT_AVATAR },
+        });
+        
+        // 发送单张图片
+        setTimeout(() => {
+          appendMsg({
+            type: 'image',
+            content: {
+              src: 'https://t7.baidu.com/it/u=1567810714,42688486&fm=193&f=GIF',
+              alt: '模型比较示例',
+              caption: '模型评测结果可视化展示',
+              time: formatTime()
+            },
+            user: { avatar: ASSISTANT_AVATAR },
+          });
+          
+          // 发送左侧图文混排
+          setTimeout(() => {
+            appendMsg({
+              type: 'image-with-text',
+              content: {
+                src: 'https://t7.baidu.com/it/u=2775453412,3865070165&fm=193&f=GIF',
+                text: '我们的平台支持多种主流大语言模型的性能对比测试。上图展示了不同模型在标准基准测试中的表现。您可以看到，在多项指标上，GPT-4和Claude 3具有明显优势。',
+                layout: 'left',
+                time: formatTime()
+              },
+              user: { avatar: ASSISTANT_AVATAR },
+            });
+            
+            // 发送右侧图文混排
+            setTimeout(() => {
+              appendMsg({
+                type: 'image-with-text',
+                content: {
+                  src: 'https://t7.baidu.com/it/u=977771457,2732388148&fm=193&f=GIF',
+                  text: '批量测试功能允许您一次性评估多个样本，快速获得全面的评测报告。您可以通过Excel文件上传批量数据，或使用我们的API进行自动化测试。',
+                  layout: 'right',
+                  time: formatTime()
+                },
+                user: { avatar: ASSISTANT_AVATAR },
+              });
+              
+              // 发送顶部图文混排
+              setTimeout(() => {
+                appendMsg({
+                  type: 'image-with-text',
+                  content: {
+                    src: 'https://t7.baidu.com/it/u=2420731103,3883209066&fm=193&f=GIF',
+                    text: '评测报告提供了详细的分析结果，包括响应质量、响应时间、一致性评分等多维度指标。您可以根据这些指标选择最适合您业务需求的模型。',
+                    layout: 'top',
+                    time: formatTime()
+                  },
+                  user: { avatar: ASSISTANT_AVATAR },
+                });
+                
+                setIsTyping(false);
+              }, 1000);
+            }, 1000);
+          }, 1000);
+        }, 600);
+      }, 800);
     } else {
       handleSend('text', reply.name);
     }
@@ -642,6 +770,16 @@ const CustomerAssistant: React.FC<CustomerAssistantProps> = memo(({ isOpen, onCl
     });
   }, [appendMsg]);
 
+  // 处理图片点击，打开预览
+  const handleImageClick = useCallback((src: string) => {
+    setPreviewImage(src);
+  }, []);
+  
+  // 关闭图片预览
+  const handleClosePreview = useCallback(() => {
+    setPreviewImage(null);
+  }, []);
+
   // 自定义渲染消息内容
   const renderMessageContent = useCallback((msg: any) => {
     const { type, content } = msg;
@@ -658,6 +796,35 @@ const CustomerAssistant: React.FC<CustomerAssistantProps> = memo(({ isOpen, onCl
     // 处理系统消息
     if (type === 'system') {
       return <SystemMessage content={content.text} />;
+    }
+    
+    // 处理图片消息
+    if (type === 'image') {
+      return (
+        <div className="message-wrapper">
+          <ImageMessage 
+            src={content.src} 
+            alt={content.alt} 
+            caption={content.caption}
+            onClick={handleImageClick}
+          />
+        </div>
+      );
+    }
+    
+    // 处理图文混排消息
+    if (type === 'image-with-text') {
+      return (
+        <div className="message-wrapper">
+          <ImageWithText 
+            src={content.src} 
+            alt={content.alt || '图片'} 
+            text={content.text}
+            layout={content.layout || 'left'}
+            onClick={handleImageClick}
+          />
+        </div>
+      );
     }
     
     // 处理常见问题卡片消息
@@ -739,7 +906,7 @@ const CustomerAssistant: React.FC<CustomerAssistantProps> = memo(({ isOpen, onCl
     }
     
     return null;
-  }, [handleCardClick, handleProductAction, handleOrderDetail, handleOrderTrack]);
+  }, [handleCardClick, handleProductAction, handleOrderDetail, handleOrderTrack, handleImageClick]);
   
   // 处理消息容器的引用获取
   const handleChatRef = useCallback((node: any) => {
@@ -791,6 +958,27 @@ const CustomerAssistant: React.FC<CustomerAssistantProps> = memo(({ isOpen, onCl
           isTyping={isTyping}
         />
       </ScrollFixer>
+      
+      {/* 图片预览层 */}
+      {previewImage && (
+        <div 
+          className="image-preview-overlay" 
+          onClick={handleClosePreview}
+        >
+          <button 
+            className="image-preview-close"
+            onClick={handleClosePreview}
+          >
+            <CloseOutlined />
+          </button>
+          <img 
+            src={previewImage} 
+            alt="预览图片" 
+            className="image-preview-image"
+            onClick={handleClosePreview}
+          />
+        </div>
+      )}
     </div>
   );
 });
