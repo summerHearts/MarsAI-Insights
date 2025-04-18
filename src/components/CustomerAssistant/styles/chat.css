@@ -186,4 +186,18 @@
 .customer-assistant-container .Carousel-wrap::-webkit-scrollbar,
 .customer-assistant-container .HorizontalList::-webkit-scrollbar {
   display: none;
+}
+
+/* 隐藏导航栏右侧的帮助和设置按钮 */
+.customer-assistant-container .Navbar-right button,
+.customer-assistant-container .Navbar-right .IconBtn {
+  display: none !important;
+}
+
+/* 确保右侧空间不占用 */
+.customer-assistant-container .Navbar-right {
+  width: 0;
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
 } 
